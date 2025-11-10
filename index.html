@@ -1,0 +1,824 @@
+
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Primeiros Povos da Península Ibérica</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f9fafb; /* bg-gray-50 */
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Custom styles for modals to be controlled by JS */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 50;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .modal.active {
+            display: flex; /* Shown when active */
+        }
+        .cursor-zoom-in {
+            cursor: zoom-in;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <!-- Image Zoom Modal -->
+    <div id="zoom-modal" class="modal" onclick="toggleZoomModal(null)">
+        <div class="relative bg-black/80 rounded-lg shadow-2xl overflow-hidden w-full max-w-5xl h-full max-h-[90vh]" onclick="event.stopPropagation()">
+            <button onclick="toggleZoomModal(null)" class="absolute top-2 right-2 bg-white/80 hover:bg-white text-gray-800 rounded-full w-10 h-10 flex items-center justify-center font-bold text-2xl shadow-lg z-10">×</button>
+            <img id="zoomed-image" src="" alt="Imagem ampliada" class="w-full h-full object-contain"/>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA CONSTANTS ---
+        const storyPages = [
+            { image: './assets/image1.jpg', title: 'Uma Terra Antiga', text: 'Bem-vindo a uma viagem no tempo pela Península Ibérica. Antes dos reinos e das nações, esta terra foi o lar de povos cujas histórias estão gravadas na pedra e na paisagem. Vamos descobrir os seus segredos.' },
+            { image: './assets/image2.jpg', title: 'A Centelha da Civilização', text: 'As primeiras comunidades eram recoletoras e nómadas. A descoberta do fogo foi uma revolução: permitiu cozinhar alimentos, aquecer, iluminar as grutas e afastar os animais ferozes, tornando a sobrevivência menos árdua.' },
+            { image: './assets/image3.jpg', title: 'Gigantes de Pedra', text: 'Com a agricultura, os povos tornaram-se sedentários. Começaram a honrar os seus mortos e as forças da natureza de formas monumentais, erguendo antas, menires e cromeleques. Estes construtores megalíticos deixaram um legado de mistério e engenharia ancestral.' },
+            { image: './assets/image4.jpg', title: 'Um Mosaico de Povos', text: 'A Península era um caldeirão de culturas. Os Iberos, no sul e leste; os Celtas, no norte e oeste. Do seu encontro nasceram os Celtiberos e, entre eles, os bravos Lusitanos, um povo de pastores e guerreiros que amava a liberdade acima de tudo.' },
+            { image: './assets/image5.jpg', title: 'A Chegada das Águias', text: 'Em 218 a.C., um novo poder chegou pelo mar. As legiões de Roma desembarcaram, atraídas pelas ricas minas e pela posição estratégica da Península. A conquista seria longa e difícil, marcada pela feroz resistência dos povos locais, como os Lusitanos liderados por Viriato.' },
+            { image: './assets/image6.jpg', title: 'O Legado de Roma', text: 'Após a conquista, veio a romanização. Estradas, pontes, cidades, o latim, o direito e, eventualmente, uma nova fé, o Cristianismo. O legado de Roma moldou a Península de forma tão profunda que as suas fundações perduram até hoje no nosso idioma, leis e cultura.' }
+        ];
+
+        const modules = [
+            { id: 'modulo1', title: 'Módulo 1: Comunidades Pré-Históricas', icon: '🗿', color: 'from-amber-600 to-yellow-700', content: { intro: 'Das grutas aos primeiros aldeamentos, a jornada do Homem na Península Ibérica foi marcada por incríveis adaptações e inovações.', sections: [ { title: 'De Recoletores a Produtores', items: [ { emoji: '🏃‍♂️', title: 'Caçadores-Recoletores', text: 'Eram nómadas, viviam da caça, pesca e recolha de frutos. Usavam instrumentos de pedra lascada e dominavam o fogo, uma descoberta crucial para cozinhar, aquecer e proteger-se.' }, { emoji: '🏠', title: 'Agropastoris', text: 'Com o fim da Idade do Gelo, tornaram-se sedentários. Desenvolveram a agricultura e a pastorícia, construindo os primeiros aldeamentos. Criaram novos instrumentos como a cerâmica, a tecelagem e a roda.' } ] }, { title: 'Construções Megalíticas: A Arte das Grandes Pedras', text: 'Estas comunidades desenvolveram newas manifestações artísticas e religiosas, construindo monumentos com grandes pedras.', items: [ { emoji: '🏛️', title: 'Antas ou Dólmenes', text: 'Túmulos coletivos, formados por grandes lajes verticais (esteios) cobertas por uma na horizontal (tampa).' }, { emoji: '⬆️', title: 'Menires', text: 'Grandes pedras isoladas, cravadas verticalmente no solo, provavelmente para cultos à natureza e fertilidade.' }, { emoji: '⭕', title: 'Cromeleques', text: 'Conjunto de menires dispostos em círculo, que funcionavam como santuários ou observatórios astronómicos.' } ] } ], activity: { type: 'problem', image: './assets/image7.jpg', question: 'Qual era a principal função de uma construção megalítica como a da imagem (uma anta ou dólmen)?', scenario: 'As comunidades que se tornaram produtoras desenvolveram newas práticas religiosas e funerárias, construindo monumentos com grandes pedras (megalitos) que tinham propósitos específicos.', options: [ { id: 'A', text: 'Servir de habitação para o chefe da tribo.', correct: false }, { id: 'B', text: 'Armazenar os cereais colhidos.', correct: false }, { id: 'C', text: 'Ser um túmulo para enterrar os mortos da comunidade.', correct: true }, { id: 'D', text: 'Funcionar como posto de vigia e defesa do aldeamento.', correct: false } ], feedback: { correct: 'Correto! As antas ou dólmenes eram monumentos funerários, usados como túmulos coletivos pelas comunidades neolíticas que se tornaram produtoras.', incorrect: 'Incorreto. A resposta certa é que serviam como túmulo. As habitações eram nos aldeamentos e o armazenamento era feito em cerâmica ou celeiros.' } } } },
+            { id: 'modulo2', title: 'Módulo 2: A Vida no Paleolítico', icon: '🔥', color: 'from-orange-600 to-red-700', content: { intro: 'Mergulhe numa recriação do dia-a-dia dos nossos antepassados mais antigos. Descubra como os caçadores-recoletores do Paleolítico sobreviviam e se organizavam.', sections: [], activity: { type: 'multiselect', image: './assets/image16.jpg', question: 'Com base na imagem e nas legendas, selecione TODAS as afirmações VERDADEIRAS sobre o modo de vida no Paleolítico:', scenario: 'Esta ilustração retrata um acampamento do Paleolítico. Analise os detalhes para identificar as características corretas deste período.', options: [ { id: 'A', text: 'Viviam em cabanas feitas de peles e ossos, e usavam o fogo para cozinhar e aquecer-se.', correct: true }, { id: 'B', text: 'Os seus instrumentos eram feitos de pedra polida e já praticavam a tecelagem.', correct: false }, { id: 'C', text: 'Protegiam-se do frio com roupas de peles de animais, cosidas com agulhas de osso.', correct: true }, { id: 'D', text: 'Eram sedentários e já domesticavam animais para obter lã e leite.', correct: false } ], correct: ['A', 'C'], feedback: { correct: 'Excelente! Ambas as afirmações estão corretas. O domínio do fogo, as habitações de peles e as roupas cosidas com agulhas de osso são características marcantes do Paleolítico.', incorrect: 'Reveja a sua resposta. As opções corretas descrevem o uso do fogo, das cabanas e das roupas de pele. A pedra polida, a tecelagem e a domesticação de animais são do Neolítico.' } } } },
+            { id: 'modulo3', title: 'Módulo 3: A Revolução do Neolítico', icon: '🌾', color: 'from-emerald-600 to-green-700', content: { intro: 'Explore as grandes transformações do Neolítico. A invenção da agricultura e da pastorícia mudou para sempre a forma como os humanos viviam.', sections: [], activity: { type: 'multiselect', image: './assets/image17.jpg', question: 'A imagem ilustra várias inovações do Neolítico. Selecione TODAS as atividades ou tecnologias que caracterizam este período:', scenario: 'Esta ilustração representa um aldeamento neolítico. Analise as newas tecnologias e atividades que marcaram esta autêntica revolução no modo de vida humano.', options: [ { id: 'A', text: 'A utilização de teares para fabricar tecidos e o uso de cerâmica para cozinhar.', correct: true }, { id: 'B', text: 'A construção de aldeias protegidas e a prática da agricultura.', correct: true }, { id: 'C', text: 'A vida nómada, em busca de frutos e animais para caçar.', correct: false }, { id: 'D', text: 'O uso exclusivo de instrumentos de pedra lascada e a habitação em grutas.', correct: false } ], correct: ['A', 'B'], feedback: { correct: 'Correto! A tecelagem, a cerâmica, a agricultura e a construção de aldeias são todas inovações fundamentais do Neolítico que levaram ao sedentarismo.', incorrect: 'Reveja a sua seleção. As opções corretas apontam para as newas tecnologias como a cerâmica e a tecelagem, e para a prática da agricultura e construção de aldeias. O nomadismo e a pedra lascada são do período anterior.' } } } },
+            { id: 'modulo4', title: 'Módulo 4: Povos Pré-Romanos', icon: '🛡️', color: 'from-orange-600 to-amber-700', content: { intro: 'Antes de Roma, a Península era um mosaico de povos com culturas e modos de vida distintos. Conheça os seus protagonistas.', sections: [ { title: 'Iberos, Celtas e o Encontro de Culturas', items: [ { emoji: '☀️', title: 'Iberos', text: 'Originários do Norte de África, ocuparam o Sul e Leste da Península. Eram agricultores e metalurgistas, trabalhando o cobre e o bronze.' }, { emoji: '🌳', title: 'Celtas', text: 'Vindos do Centro da Europa, ocuparam o Noroeste. Eram guerreiros, trabalhavam o ferro e viviam em povoados fortificados no alto de montes (castros).' }, { emoji: '🤝', title: 'Celtiberos', text: 'Da união dos Iberos e Celtas surgiram os Celtiberos, que se organizavam em tribos e viviam em castros.' } ] }, { title: 'Os Lusitanos: A Resistência Feroz', text: 'Uma das tribos celtiberas mais famosas, os Lusitanos dominaram o território entre os rios Douro e Tejo. Eram pastores e guerreiros temíveis, conhecidos pela sua tática de guerrilha. Liderados pelo pastor e estratega Viriato, infligiram pesadas derrotas aos exércitos romanos durante anos, tornando-se um símbolo de resistência à conquista.' } ], activity: { type: 'problem', image: './assets/image8.jpg', question: 'Qual povo, liderado por Viriato, era famoso por viver em castros e resistir ferozmente aos invasores romanos?', scenario: 'Várias tribos habitavam a Península Ibérica. Uma delas, conhecida pela sua bravura e táticas de guerrilha, tornou-se um símbolo da resistência contra Roma.', options: [ { id: 'A', text: 'Fenícios', correct: false }, { id: 'B', text: 'Iberos', correct: false }, { id: 'C', text: 'Lusitanos', correct: true }, { id: 'D', text: 'Gregos', correct: false } ], feedback: { correct: 'Exato! Os Lusitanos, liderados por Viriato, eram famosos pela sua bravura e por viverem em castros, oferecendo uma resistência feroz aos romanos.', incorrect: 'A resposta correta é Lusitanos. Os Fenícios e Gregos eram principalmente povos comerciantes e os Iberos, embora tenham resistido, não são tão associados à liderança de Viriato.' } } } },
+            { id: 'modulo5', title: 'Módulo 5: Dos Fragmentos ao Império', icon: '🎬', color: 'from-gray-600 to-slate-700', 
+              content: { 
+                intro: 'Assista a este documentário para compreender a transição dos povos fragmentados da Península para a unificação sob o domínio do Império Romano.', 
+                media: { type: 'video', src: './assets/Dos_Fragmentos_ao_Imperio.mp4' }, 
+                sections: [], 
+                activity: { 
+                    type: 'quiz',
+                    questions: [
+                        { id: 'q1', type: 'mcq', question: 'Qual foi um dos principais motivos que, segundo o vídeo, levou os Romanos a invadir a Península Ibérica?', options: [ { id: 'A', text: 'As ricas minas de ouro e prata.', correct: true }, { id: 'B', text: 'A curiosidade científica sobre a geografia local.', correct: false }, { id: 'C', text: 'Uma aliança militar pré-existente com os Lusitanos.', correct: false }, { id: 'D', text: 'A busca por newas rotas comerciais para a Índia.', correct: false } ], feedback: { correct: 'Correto! As vastas riquezas minerais da Península Ibérica, especialmente o ouro e a prata, foram um enorme atrativo para a República Romana.', incorrect: 'Incorreto. A principal motivação foi económica, impulsionada pelas ricas minas de metais preciosos da Península.' } },
+                        { id: 'q2', type: 'mcq', question: 'Que rival de Roma já tinha uma forte presença na Península e foi o motivo inicial para a intervenção romana (Segunda Guerra Púnica)?', options: [ { id: 'A', text: 'Os Gregos', correct: false }, { id: 'B', text: 'Os Egípcios', correct: false }, { id: 'C', text: 'Os Cartagineses', correct: true }, { id: 'D', text: 'Os Persas', correct: false } ], feedback: { correct: 'Exato! A luta contra Cartago, liderada por Aníbal, foi o que levou as legiões romanas pela primeira vez à Península.', incorrect: 'A resposta correta é Cartagineses. A Segunda Guerra Púnica entre Roma e Cartago foi o gatilho da conquista.' } },
+                        { id: 'q3', type: 'mcq', question: 'O processo de adotar a língua, leis e costumes romanos é conhecido como:', options: [ { id: 'A', text: 'Globalização', correct: false }, { id: 'B', text: 'Romanização', correct: true }, { id: 'C', text: 'Urbanização', correct: false }, { id: 'D', text: 'Democratização', correct: false } ], feedback: { correct: 'Muito bem! A Romanização foi o processo, lento mas profundo, de integração cultural dos povos conquistados no mundo romano.', incorrect: 'O termo correto é Romanização. Foi através deste processo que a cultura romana se espalhou pelo império.' } },
+                        { id: 'q4', type: 'image_mcq', question: 'Qual das seguintes imagens representa uma obra de engenharia romana mencionada no vídeo (um aqueduto)?', options: [ { id: 'A', img: './assets/image_aqueduto.jpg', text: 'Aqueduto', correct: true }, { id: 'B', img: './assets/image_piramide.jpg', text: 'Pirâmide', correct: false }, { id: 'C', img: './assets/image_catedral.jpg', text: 'Catedral Gótica', correct: false }, { id: 'D', img: './assets/image_ponte_moderna.jpg', text: 'Ponte Moderna', correct: false } ], feedback: { correct: 'Correto! Os aquedutos, como o de Segóvia, são um exemplo espetacular da engenharia romana, construídos para transportar água para as cidades.', incorrect: 'A resposta correta é o Aqueduto. As pirâmides são egípcias, as catedrais góticas são medievais e a ponte é contemporânea.' } },
+                        { id: 'q5', type: 'true_false', question: 'A conquista romana da Península Ibérica foi rápida e durou apenas alguns anos.', options: [ { id: 'V', text: 'Verdadeiro', correct: false }, { id: 'F', text: 'Falso', correct: true } ], feedback: { correct: 'Isso mesmo, é falso! A conquista foi um processo longo e difícil que durou quase 200 anos, de 218 a.C. a 19 a.C., devido à forte resistência dos povos locais.', incorrect: 'Incorreto. A afirmação é falsa. A conquista foi um processo extremamente longo, demorando cerca de 200 anos a ser concluído.' } },
+                        { id: 'q6', type: 'fill_blank', question: 'A língua que os romanos introduziram, e que é a base da língua portuguesa, é o ______.', correct: 'Latim', feedback: { correct: 'Perfeito! O Latim vulgar, falado pelos soldados e colonos romanos, deu origem ao português e a muitas outras línguas românicas.', incorrect: 'A resposta correta é Latim. É a herança linguística mais importante que Roma nos deixou.' } }
+                    ]
+                } 
+              } 
+            },
+            { id: 'modulo6', title: 'Módulo 6: A Voz da Conquista', icon: '🎧', color: 'from-cyan-600 to-teal-700', 
+              content: { 
+                intro: 'Ouça este áudio para aprofundar o conhecimento sobre os povos pré-romanos e as táticas de conquista e resistência que marcaram este período.', 
+                media: { type: 'audio', src: './assets/IbericaPreRomana_e_Conquistaromana.mp3' }, 
+                sections: [], 
+                activity: { 
+                    type: 'quiz',
+                    questions: [
+                        { id: 'q1', type: 'mcq', question: 'De acordo com o áudio, que tática militar era a especialidade dos Lusitanos na sua resistência contra os Romanos?', options: [ { id: 'A', text: 'Grandes batalhas em campo aberto com cavalaria pesada.', correct: false }, { id: 'B', text: 'Ataques de surpresa e emboscadas (tática de guerrilha).', correct: true }, { id: 'C', text: 'Construção de muralhas altas em redor das cidades.', correct: false }, { id: 'D', text: 'O uso de elefantes de guerra, aprendida com os Cartagineses.', correct: false } ], feedback: { correct: 'Exato! Os Lusitanos, liderados por Viriato, eram mestres na tática de guerrilha, usando o terreno a seu favor para infligir pesadas baixas aos exércitos romanos.', incorrect: 'A resposta correta é a tática de guerrilha. Os Lusitanos evitavam o confronto direto em campo aberto, onde a legião romana era superior.' } },
+                        { id: 'q2', type: 'mcq', question: 'O áudio menciona que os povos celtas, que viviam no norte e oeste, habitavam em povoados fortificados chamados:', options: [ { id: 'A', text: 'Vilas Romanas', correct: false }, { id: 'B', text: 'Aldeamentos', correct: false }, { id: 'C', text: 'Antas', correct: false }, { id: 'D', text: 'Castros', correct: true } ], feedback: { correct: 'Correto! Os castros, situados no cimo de montes, eram as habitações e fortalezas típicas da cultura castreja (Celtas e Celtiberos).', incorrect: 'A resposta correta é Castros. Eram povoados fortificados, bem adaptados à paisagem e às necessidades de defesa.' } },
+                        { id: 'q3', type: 'mcq', question: 'Além dos metais, que outro recurso da Península era muito valorizado pelos povos do Mediterrâneo, como os Fenícios?', options: [ { id: 'A', text: 'Sal', correct: true }, { id: 'B', text: 'Seda', correct: false }, { id: 'C', text: 'Especiarias', correct: false }, { id: 'D', text: 'Madeiras exóticas', correct: false } ], feedback: { correct: 'Isso mesmo! O sal era um recurso vital para a conservação de alimentos, como o peixe, tornando-se um produto comercial de grande importância.', incorrect: 'A resposta certa é o sal. A seda e as especiarias vinham do Oriente, e a Península não era conhecida por madeiras exóticas nessa época.' } }
+                    ]
+                } 
+              } 
+            },
+            { id: 'modulo7', title: 'Módulo 7: A Romanização', icon: '🏛️', color: 'from-purple-600 to-indigo-700', content: { intro: 'A conquista romana transformou a Península Ibérica para sempre, deixando um legado que perdura até aos dias de hoje.', sections: [ { title: 'A Conquista Romana (início em 218 a.C.)', text: 'Os romanos conquistaram a Península por duas razões principais:', items: [ { emoji: '🗺️', title: 'Controlo Estratégico', text: 'A Península era vital para controlar o Mediterrâneo e o acesso ao Atlântico.' }, { emoji: '💎', title: 'Motivos Económicos', text: 'A terra era rica em metais preciosos como ouro e prata, além de produtos agrícolas.' } ] }, { title: 'Fatores da Romanização', text: 'A romanização foi o processo de adoção da cultura romana pelos povos locais, facilitado por vários fatores:', items: [ { emoji: '🗣️', title: 'Latim', text: 'A língua dos romanos, que deu origem ao português.' }, { emoji: '🛣️', title: 'Rede de Estradas e Pontes', text: 'Ligavam todo o império, facilitando o comércio e o movimento de tropas.' }, { emoji: '⚖️', title: 'Direito Romano', text: 'Um conjunto de leis que se tornou a base da legislação moderna.' }, { emoji: '🏙️', title: 'Cidades e Infraestruturas', text: 'Construção de cidades com teatros, termas, aquedutos e templos.' } ] }, { title: 'A Cristianização', text: 'Inicialmente perseguido, o Cristianismo difundiu-se pelo império. Em 313, o imperador Constantino concedeu liberdade de culto. Em 380, o imperador Teodósio tornou o Cristianismo a religião oficial, marcando profundamente a cultura da Península.' } ], activity: { type: 'problem', image: './assets/image9.jpg', question: 'A imagem de uma ponte romana (como a de Chaves) é um exemplo de qual importante fator da romanização?', scenario: 'Para unificar e administrar o seu vasto império, os Romanos investiram massivamente em construções que facilitavam as comunicações, o comércio e o movimento das suas legiões.', options: [ { id: 'A', text: 'Adoção do Latim.', correct: false }, { id: 'B', text: 'Imposição do Direito Romano.', correct: false }, { id: 'C', text: 'Construção de uma vasta rede de estradas e pontes.', correct: true }, { id: 'D', text: 'A fundação de escolas filosóficas.', correct: false } ], feedback: { correct: 'Isso mesmo! As pontes e estradas romanas foram uma obra de engenharia fundamental para unificar o império, sendo um dos mais visíveis legados da romanização.', incorrect: 'A resposta correta é a construção da rede de estradas e pontes. O Latim e o Direito são legados imateriais, e a filosofia não foi um fator principal da romanização.' } } } },
+            { id: 'modulo8', title: 'Módulo 8: Desafio de Identificação', icon: '🖼️', color: 'from-teal-600 to-cyan-700', content: { intro: 'Analise as imagens para distinguir os modos de vida das primeiras comunidades: os caçadores-recoletores nómadas e os agropastoris sedentários.', sections: [], activity: { type: 'problem', image: './assets/image14.jpg', question: 'Observando os documentos na imagem, quais deles representam a comunidade agropastoril, que já praticava a agricultura e a pastorícia?', scenario: 'As imagens de 1 a 6 ilustram diferentes atividades das comunidades pré-históricas. A sua tarefa é agrupar as que correspondem ao modo de vida agropastoril.', options: [ { id: 'A', text: 'Documentos 1, 4 e 5.', correct: false }, { id: 'B', text: 'Documentos 2, 3 e 6.', correct: true }, { id: 'C', text: 'Documentos 1, 2 e 3.', correct: false }, { id: 'D', text: 'Documentos 4, 5 e 6.', correct: false } ], feedback: { correct: 'Correto! Os documentos 2 (armazenamento de cereais), 3 (pastorícia) e 6 (ceifa) mostram atividades de uma comunidade produtora e sedentária.', incorrect: 'Incorreto. A resposta certa é 2, 3 e 6. Os documentos 1, 4 e 5 mostram cenas de caça e um modo de vida mais dependente dos recursos naturais imediatos, típico dos caçadores-recoletores.' } } } },
+            { id: 'modulo9', title: 'Módulo 9: Legados do Comércio', icon: '⛵', color: 'from-sky-600 to-blue-700', content: { intro: 'A Península Ibérica foi um ponto de encontro para muitos povos do Mediterrâneo, que trouxeram mais do que apenas mercadorias.', sections: [], activity: { type: 'problem', image: './assets/image8.jpg', question: 'Os Fenícios, um povo comerciante do Mediterrâneo, deixaram um legado muito importante aos povos peninsulares. Qual foi esse legado?', scenario: 'O mapa mostra as rotas e a proveniência de vários povos que visitaram a Península Ibérica, como Fenícios, Gregos e Cartagineses, para comerciar e buscar metais.', options: [ { id: 'A', text: 'A invenção da roda.', correct: false }, { id: 'B', text: 'A transmissão do seu alfabeto.', correct: true }, { id: 'C', text: 'A construção de monumentos megalíticos.', correct: false }, { id: 'D', text: 'A introdução do cavalo.', correct: false } ], feedback: { correct: 'Exato! O alfabeto fenício é um dos maiores legados deste povo, tendo servido de base para o alfabeto grego e, posteriormente, o latino que usamos até hoje.', incorrect: 'A resposta correta é o alfabeto. A roda e os megalitos são muito anteriores, e o cavalo já existia na Península.' } } } },
+            { id: 'modulo10', title: 'Módulo 10: Análise do Mapa Imperial', icon: '🗺️', color: 'from-rose-600 to-pink-700', content: { intro: 'Os mapas são documentos históricos valiosos. Aprenda a interpretar um mapa do Império Romano para extrair informações sobre a sua economia.', sections: [], activity: { type: 'problem', image: './assets/image15.jpg', question: 'De acordo com o mapa do Império Romano, qual destas afirmações é confirmada pela legenda e pelas rotas comerciais?', scenario: 'Este mapa representa a extensão máxima do Império Romano no século II, mostrando as suas províncias, rotas comerciais e os principais produtos de cada região.', options: [ { id: 'A', text: 'O exército romano era muito numeroso e disciplinado.', correct: false }, { id: 'B', text: 'As principais riquezas da Península Ibérica (Hispânia) eram ouro, prata, vinho e frutos secos.', correct: true }, { id: 'C', text: 'Os comerciantes romanos dominavam as rotas das sedas da China.', correct: false }, { id: 'D', text: 'Alguns povos resistiram aos romanos, mas foram derrotados.', correct: false } ], feedback: { correct: 'Correto! Ao observar a região da Hispânia no mapa e cruzar com a legenda, vemos claramente os símbolos de ouro, prata, vinho e frutos secos.', incorrect: 'Incorreto. A única afirmação que pode ser verificada diretamente no mapa é sobre as riquezas da Península Ibérica, através da legenda de produtos.' } } } },
+            { id: 'modulo11', title: 'Módulo 11: Detetive da História', icon: '✍️', color: 'from-red-600 to-orange-700', content: { intro: 'Atenção aos detalhes! Nem sempre a informação que lemos está correta. Este desafio testa a sua capacidade de identificar erros históricos.', sections: [], activity: { type: 'problem', image: './assets/image10.jpg', question: 'O texto original da fonte continha vários erros históricos. Qual das seguintes frases descreve corretamente os eventos da conquista romana?', scenario: 'A imagem retrata uma batalha entre Romanos e Lusitanos. Um texto que a acompanha na fonte original tem erros. Analise as opções para encontrar a afirmação correta.', options: [ { id: 'A', text: 'O exército dos Lusitanos invadiu a Península Ibérica em 218 a.C.', correct: false }, { id: 'B', text: 'Viriato foi um famoso chefe dos Romanos que lutou contra os Lusitanos.', correct: false }, { id: 'C', text: 'Os Romanos viviam em castros no alto dos montes.', correct: false }, { id: 'D', text: 'Os Lusitanos, liderados por Viriato, eram conhecidos por fazer emboscadas ao exército romano.', correct: true } ], feedback: { correct: 'Muito bem! Esta afirmação está correta. Foram os Romanos que invadiram, Viriato era Lusitano, e os castros eram habitações dos Celtas e Lusitanos. A tática de guerrilha (emboscadas) era a especialidade de Viriato.', incorrect: 'A resposta correta é a D. Foram os Romanos que invadiram a Península em 218 a.C.; Viriato era o líder dos Lusitanos; e os castros eram as fortificações dos Lusitanos, não dos Romanos.' } } } },
+            { id: 'modulo12', title: 'Módulo 12: Herança em Imagens', icon: '🌉', color: 'from-lime-600 to-green-700', content: { intro: 'A herança romana está por toda a parte. Consegue associar a descrição correta a cada vestígio do passado?', sections: [], activity: { type: 'problem', image: './assets/image11.jpg', question: 'A imagem mostra quatro exemplos do legado romano. A qual deles corresponde a descrição: "Os romanos construíram uma rede de estradas que cobria o império e que abrangia toda a Península Ibérica"?', scenario: 'Os Romanos deixaram uma herança duradoura na Península Ibérica, visível em construções, na língua e na organização do território, como mostram os quatro documentos.', options: [ { id: 'A', text: 'Às ruínas da cidade de Conímbriga (Doc. 3).', correct: false }, { id: 'B', text: 'À herança da língua latina (Doc. 4).', correct: false }, { id: 'C', text: 'Ao mapa das estradas do império (Doc. 5).', correct: true }, { id: 'D', text: 'À ponte romana de Chaves (Doc. 6).', correct: false } ], feedback: { correct: 'Exato! O documento 5 é um mapa que representa a vasta e complexa rede de estradas (vias) que os romanos construíram para ligar o seu império.', incorrect: 'A resposta correta é o mapa. A descrição fala de uma "rede de estradas que cobria o império", o que corresponde diretamente ao mapa (Doc. 5).' } } } },
+            { id: 'modulo13', title: 'Módulo 13: Contagem de Séculos', icon: '⏳', color: 'from-violet-600 to-purple-700', content: { intro: 'Um bom historiador sabe situar os acontecimentos no tempo. Teste a sua habilidade em converter anos em séculos.', sections: [], activity: { type: 'problem', question: 'O Tratado de Zamora, que marcou o início de Portugal como reino independente, foi assinado em 1143. A que século corresponde este ano?', scenario: 'Compreender a contagem dos séculos é fundamental para organizar os eventos históricos. Lembre-se da regra: para anos depois de Cristo, some 1 aos dois primeiros dígitos (ou ao primeiro, se o ano tiver 3 dígitos), a não ser que termine em "00".', options: [ { id: 'A', text: 'Século X', correct: false }, { id: 'B', text: 'Século XI', correct: false }, { id: 'C', text: 'Século XII', correct: true }, { id: 'D', text: 'Século XIII', correct: false } ], feedback: { correct: 'Correto! O ano de 1143 pertence ao século XII. O século XII vai do ano 1101 ao ano 1200.', incorrect: 'A resposta correta é século XII. Para o ano 1143, olhamos para os dois primeiros dígitos (11) e somamos 1, o que dá 12.' } } } }
+        ];
+
+        const finalQuiz = [
+            { id: 'q1', question: 'Qual a principal diferença entre as comunidades recoletoras e as agropastoris?', type: 'mcq', options: [ { id: 'A', text: 'Os recoletores usavam ferro e os agropastoris usavam bronze.' }, { id: 'B', text: 'Os recoletores eram nómadas e os agropastoris eram sedentários.' }, { id: 'C', text: 'Os recoletores construíam cromeleques e os agropastoris construíam cidades.' }, { id: 'D', text: 'Não existiam diferenças significativas.' } ], correct: 'B', feedback: { correct: 'Exato! A transição do nomadismo para o sedentarismo, graças à agricultura, é a diferença fundamental.', incorrect: 'Incorreto. A principal diferença foi a passagem de um estilo de vida nómada (recoletores) para um sedentário (agropastoris).' } },
+            { id: 'q2', question: 'A conquista romana da Península Ibérica começou no século III a.C.', type: 'truefalse', options: [ {id: 'V', text: 'Verdadeiro'}, {id: 'F', text: 'Falso'} ], correct: 'V', feedback: { correct: 'Correto! A invasão começou em 218 a.C., que pertence ao século III a.C.', incorrect: 'Na verdade, é verdadeiro. O ano 218 a.C. marca o início da Segunda Guerra Púnica e da presença romana na Península.' } },
+            { id: 'q3', question: 'O famoso líder da resistência lusitana contra os romanos chamava-se:', type: 'mcq', options: [ { id: 'A', text: 'César' }, { id: 'B', text: 'Aníbal' }, { id: 'C', text: 'Viriato' }, { id: 'D', text: 'Teodósio' } ], correct: 'C', feedback: { correct: 'Perfeito! Viriato, o pastor que se tornou general, é um grande símbolo da luta pela liberdade.', incorrect: 'A resposta correta é Viriato. Ele liderou os Lusitanos e foi um grande estratega militar.' } },
+            { id: 'q4', question: 'Qual destes NÃO é um legado da cultura romana na Península Ibérica?', type: 'mcq', options: [ { id: 'A', text: 'A língua portuguesa.' }, { id: 'B', text: 'As bases do Direito.' }, { id: 'C', text: 'As construções megalíticas.' }, { id: 'D', text: 'A religião Cristã.' } ], correct: 'C', feedback: { correct: 'Isso mesmo! As construções megalíticas (antas, menires) são pré-históricas, muito anteriores à chegada dos romanos.', incorrect: 'Incorreto. As construções megalíticas são da pré-história. A língua, o direito e o cristianismo (que se tornou oficial no império) são legados romanos.' } },
+            { id: 'q5', question: 'O imperador que tornou o Cristianismo a religião oficial do Império Romano foi...', type: 'mcq', options: [ { id: 'A', text: 'Constantino' }, { id: 'B', text: 'Teodósio' }, { id: 'C', text: 'Viriato' }, { id: 'D', text: 'César Augusto' } ], correct: 'B', feedback: { correct: 'Correto! Foi Teodósio, através do Édito de Salónica em 380. Constantino apenas concedeu liberdade de culto em 313.', incorrect: 'A resposta correta é Teodósio. Constantino foi importante porque concedeu a liberdade de culto aos cristãos, mas foi Teodósio que a tornou a religião oficial.' } },
+            { id: 'q6', question: 'Um conjunto de menires dispostos em círculo, que funcionava como santuário, é chamado de:', type: 'mcq', options: [ { id: 'A', text: 'Anta' }, { id: 'B', text: 'Dólmen' }, { id: 'C', text: 'Castro' }, { id: 'D', text: 'Cromeleque' } ], correct: 'D', feedback: { correct: 'Exato! Os cromeleques são círculos de pedras erguidas, com funções religiosas ou astronómicas.', incorrect: 'A resposta correta é Cromeleque. Uma anta ou dólmen é um túmulo, e um castro é um povoado fortificado.' } },
+            { id: 'q7', question: 'Os Iberos, que ocuparam o Sul e Leste da Península, eram especialistas a trabalhar com quais metais?', type: 'mcq', options: [ { id: 'A', text: 'Ouro e Ferro' }, { id: 'B', text: 'Cobre e Bronze' }, { id: 'C', text: 'Apenas Estanho' }, { id: 'D', text: 'Alumínio e Aço' } ], correct: 'B', feedback: { correct: 'Correto! Os Iberos tinham conhecimento da metalurgia do cobre e do bronze, metais importantes para ferramentas e armas antes da Idade do Ferro.', incorrect: 'Incorreto. Os Iberos eram conhecidos por trabalharem o cobre e a sua liga, o bronze. O ferro foi mais difundido pelos Celtas.' } },
+            { id: 'q8', question: 'Os povoados fortificados que os Celtas construíam no alto dos montes chamavam-se:', type: 'mcq', options: [ { id: 'A', text: 'Vilas' }, { id: 'B', text: 'Cidades' }, { id: 'C', text: 'Castros' }, { id: 'D', text: 'Cromeleques' } ], correct: 'C', feedback: { correct: 'Isso mesmo! Os Castros são os povoados fortificados característicos da cultura celta e celtibera na Península Ibérica.', incorrect: 'A resposta correta é Castros. Eram povoados situados em locais altos para facilitar a defesa.' } },
+            { id: 'q9', question: 'A língua que os romanos introduziram e que deu origem ao português foi o:', type: 'mcq', options: [ { id: 'A', text: 'Grego' }, { id: 'B', text: 'Latim' }, { id: 'C', text: 'Ibérico' }, { id: 'D', text: 'Celta' } ], correct: 'B', feedback: { correct: 'Perfeito! O Latim, a língua de Roma, é a base da língua portuguesa e de várias outras línguas europeias.', incorrect: 'A resposta correta é o Latim. É a herança linguística mais importante deixada pelos romanos.' } },
+            { id: 'q10', question: 'Os romanos construíram uma vasta rede de estradas e pontes para facilitar o comércio e o movimento das suas tropas.', type: 'truefalse', options: [ {id: 'V', text: 'Verdadeiro'}, {id: 'F', text: 'Falso'} ], correct: 'V', feedback: { correct: 'Correto! A engenharia romana, especialmente as suas estradas, foi fundamental para manter o controlo e a coesão do vasto Império.', incorrect: 'Esta afirmação é verdadeira. A rede viária romana foi um dos pilares da sua administração e um fator crucial da romanização.' } }
+        ];
+        
+        // --- APPLICATION STATE ---
+        let appState = {
+            page: 'intro', // 'intro', 'story', 'modules', 'module', 'quiz'
+            storyPageIndex: 0,
+            currentModuleIndex: null,
+            moduleProgress: {}, // { moduleId: score_percentage }
+            // ModuleDetail state
+            activityAnswers: {}, // { 'problem': 'C', 'multiselect': ['A', 'B'], 'quiz': { q1: 'A', q2: 'C', ... } }
+            currentModuleQuestionIndex: 0,
+            showModuleFeedback: false,
+            // Quiz state
+            quizAnswers: {},
+            showQuizFeedback: {},
+            userName: '',
+            showCertificate: false,
+        };
+
+        const root = document.getElementById('root');
+
+        // --- NAVIGATION & RENDERING ---
+        function navigateTo(newPage, data = null) {
+            appState.page = newPage;
+            if (newPage === 'module') {
+                appState.currentModuleIndex = data;
+                appState.activityAnswers = {};
+                appState.currentModuleQuestionIndex = 0;
+                appState.showModuleFeedback = false;
+            } else {
+                appState.currentModuleIndex = null;
+            }
+            if(newPage === 'story') {
+                appState.storyPageIndex = 0;
+            }
+             if(newPage === 'quiz') {
+                appState.quizAnswers = {};
+                appState.showQuizFeedback = {};
+                appState.userName = '';
+                appState.showCertificate = false;
+            }
+            window.scrollTo(0, 0);
+            renderApp();
+        }
+
+        function renderApp() {
+            let content = '';
+            switch (appState.page) {
+                case 'intro': content = renderIntro(); break;
+                case 'story': content = renderStory(); break;
+                case 'modules': content = renderModuleList(); break;
+                case 'module': content = renderModuleDetail(); break;
+                case 'quiz': content = renderQuiz(); break;
+                default: content = renderIntro();
+            }
+            root.innerHTML = renderNavbar() + `<main class="pt-20 fade-in">${content}</main>`;
+        }
+        
+        // --- COMPONENT RENDER FUNCTIONS ---
+        function renderNavbar() {
+            const navLink = (pageName, text, activePages = []) => {
+                const isActive = appState.page === pageName || activePages.includes(appState.page);
+                const activeClass = "text-amber-700 font-bold border-b-2 border-amber-600";
+                const inactiveClass = "text-gray-600 hover:text-amber-700 transition-colors";
+                return `
+                    <li>
+                        <button onclick="navigateTo('${pageName}')" class="px-3 py-2 text-lg font-medium ${isActive ? activeClass : inactiveClass}" aria-current="${isActive ? 'page' : 'false'}">
+                            ${text}
+                        </button>
+                    </li>
+                `;
+            };
+            return `
+                <header class="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md shadow-md z-40">
+                    <nav class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div class="flex justify-between items-center h-20">
+                            <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateTo('intro')">
+                                <span class="text-4xl" aria-hidden="true">🏛️</span>
+                                <span class="font-bold text-2xl text-amber-800">Península Ibérica</span>
+                            </div>
+                            <ul class="hidden md:flex items-center space-x-6">
+                                ${navLink('intro', 'Início')}
+                                ${navLink('story', 'A Viagem')}
+                                ${navLink('modules', 'Módulos', ['module'])}
+                                ${navLink('quiz', 'Questionário')}
+                            </ul>
+                        </div>
+                    </nav>
+                </header>
+            `;
+        }
+
+        function renderFooter() {
+            return `
+                <footer class="bg-gradient-to-r from-amber-900 to-yellow-900 text-white py-6 mt-12">
+                    <div class="max-w-6xl mx-auto px-4 text-center">
+                        <p class="text-lg font-medium">©2024 Uma Viagem pela História</p>
+                        <p class="text-amber-200 text-sm mt-2">Explorando as raízes da Península Ibérica</p>
+                    </div>
+                </footer>
+            `;
+        }
+        
+        function renderImageWithPlaceholder(src, alt) {
+            return `<div class="w-full h-full cursor-zoom-in" onclick="toggleZoomModal('${src}')"><img src="${src}" alt="${alt}" class="w-full h-full object-cover" loading="lazy" /></div>`;
+        }
+
+        function renderIntro() {
+            return `
+                <div class="min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 p-8 flex items-center justify-center">
+                    <div class="max-w-4xl mx-auto text-center">
+                        <h1 class="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-yellow-700 mb-4">Primeiros Povos da Península Ibérica</h1>
+                        <p class="text-lg md:text-xl text-gray-600 mb-12">Uma jornada interativa das origens à romanização.</p>
+                        <div class="bg-white rounded-2xl shadow-2xl p-8 mb-8 text-left">
+                            <p class="text-lg text-gray-700 leading-relaxed mb-6">Este percurso educativo convida-o a explorar as fundações da história da Península Ibérica. Descubra como viviam as primeiras comunidades, quem eram os povos que habitavam estas terras antes da chegada de Roma, e como o Império Romano moldou para sempre a cultura, a língua e a sociedade da região.</p>
+                        </div>
+                        <div class="space-y-6">
+                            <button onclick="navigateTo('story')" class="w-full max-w-xs px-8 py-4 bg-gradient-to-r from-amber-600 to-yellow-700 text-white text-xl font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition">Começar a Viagem</button>
+                        </div>
+                    </div>
+                </div>
+                ${renderFooter()}
+            `;
+        }
+
+        function renderStory() {
+            const page = storyPages[appState.storyPageIndex];
+            const isLastPage = appState.storyPageIndex === storyPages.length - 1;
+            const isFirstPage = appState.storyPageIndex === 0;
+
+            return `
+                <div class="min-h-screen bg-gradient-to-br from-amber-50 to-yellow-50 p-4 sm:p-8">
+                    <div class="max-w-6xl w-full mx-auto">
+                        <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+                            <div class="bg-gradient-to-r from-amber-600 to-yellow-700 p-4 sm:p-6 text-white">
+                                <h2 class="text-2xl sm:text-3xl font-bold">Uma Viagem no Tempo</h2>
+                                <p class="text-amber-100 mt-1 text-sm sm:text-base">Capítulo ${appState.storyPageIndex + 1}: ${page.title}</p>
+                            </div>
+                            <div class="p-4 sm:p-8">
+                                <div class="grid md:grid-cols-2 gap-6 mb-8">
+                                    <div class="bg-gray-200 rounded-xl overflow-hidden h-64 md:h-96 flex items-center justify-center shadow-lg">
+                                        ${renderImageWithPlaceholder(page.image, page.title)}
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="bg-gradient-to-br from-amber-50 to-yellow-50 p-6 rounded-xl border-2 border-amber-200 shadow-md">
+                                            <p class="text-base sm:text-lg leading-relaxed text-gray-800">${page.text}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between items-center flex-wrap gap-4 pt-4 border-t-2 border-gray-200">
+                                    <button onclick="handleStoryNav('prev')" ${isFirstPage ? 'disabled' : ''} class="flex items-center gap-2 px-6 py-3 bg-amber-600 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-amber-700 transition shadow-md">← Anterior</button>
+                                    <span class="text-gray-600 font-medium">Página ${appState.storyPageIndex + 1} de ${storyPages.length}</span>
+                                    ${!isLastPage ? 
+                                        `<button onclick="handleStoryNav('next')" class="flex items-center gap-2 px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition shadow-md">Próxima →</button>` :
+                                        `<button onclick="navigateTo('modules')" class="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition shadow-md">Explorar Módulos →</button>`
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                ${renderFooter()}
+            `;
+        }
+        
+        function renderModuleList() {
+            const completedModules = Object.values(appState.moduleProgress).filter(score => score > 0).length;
+
+            return `
+                <div class="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 p-4 sm:p-8">
+                    <div class="max-w-6xl mx-auto">
+                        <div class="text-center mb-12">
+                            <h2 class="text-4xl font-bold text-gray-800 mb-4">Módulos de Aprendizagem</h2>
+                            <p class="text-xl text-gray-600">Escolha um módulo para começar a explorar</p>
+                             ${completedModules > 0 ? `
+                                <div class="mt-6 inline-block bg-white rounded-xl shadow-lg p-6">
+                                    <p class="text-lg font-semibold text-gray-700 mb-2">
+                                        ${completedModules} de ${modules.length} módulos concluídos
+                                    </p>
+                                </div>` : ''
+                            }
+                        </div>
+                        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                            ${modules.map((module, idx) => {
+                                const scorePercentage = appState.moduleProgress[module.id] || 0;
+                                const isCompleted = scorePercentage === 100;
+                                const isStarted = scorePercentage > 0;
+                                const progressText = isCompleted ? 'Concluído' : (isStarted ? `${scorePercentage}%` : 'Não iniciado');
+                                const progressTextColor = isCompleted ? 'text-green-600' : 'text-gray-500';
+
+                                return `
+                                    <div onclick="navigateTo('module', ${idx})" class="bg-white rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 cursor-pointer overflow-hidden flex flex-col">
+                                        <div class="bg-gradient-to-r ${module.color} p-6 text-white">
+                                            <div class="flex items-center gap-3">
+                                                <span class="text-3xl" title="${module.title}">${module.icon}</span>
+                                                <span class="text-2xl font-bold">Módulo ${idx + 1}</span>
+                                            </div>
+                                        </div>
+                                        <div class="p-6 flex-grow flex flex-col">
+                                            <h3 class="text-xl font-bold text-gray-800 mb-3">${module.title.split(': ')[1]}</h3>
+                                            <p class="text-gray-600 flex-grow mb-4">${module.content.intro}</p>
+                                            <div class="mt-auto pt-4 border-t border-gray-200">
+                                                <p class="text-sm font-semibold mb-2">Progresso: <span class="${progressTextColor}">${progressText}</span></p>
+                                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                                    <div class="bg-green-600 h-2.5 rounded-full transition-all duration-500" style="width: ${scorePercentage}%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                        <div class="text-center">
+                            <button onclick="navigateTo('quiz')" class="px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-700 text-white text-xl font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition inline-flex items-center gap-3">🏆 Questionário Final</button>
+                        </div>
+                    </div>
+                </div>
+                ${renderFooter()}
+            `;
+        }
+
+        function renderModuleDetail() {
+            const module = modules[appState.currentModuleIndex];
+            if (!module) return '<div>Módulo não encontrado.</div>';
+            
+            const isCompleted = (appState.moduleProgress[module.id] || 0) === 100;
+            const activity = module.content.activity;
+            
+            const renderFeedback = (question) => {
+                if (!appState.showModuleFeedback && activity.type !== 'quiz') return '';
+                
+                let isCorrect;
+                let feedbackText;
+                const answer = (appState.activityAnswers.quiz || {})[question.id];
+
+                if (activity.type === 'problem' || activity.type === 'multiselect') {
+                    const allAnswers = appState.activityAnswers[activity.type] || (activity.type === 'multiselect' ? [] : null);
+                    isCorrect = checkModuleAnswer(activity, allAnswers);
+                    feedbackText = isCorrect ? activity.feedback.correct : activity.feedback.incorrect;
+                } else if (activity.type === 'quiz') {
+                    if (answer === undefined) return ''; // No feedback for this specific question yet
+                    
+                    if (question.type === 'fill_blank') {
+                        isCorrect = answer.trim().toLowerCase() === question.correct.trim().toLowerCase();
+                    } else { // mcq, true_false, image_mcq
+                        isCorrect = answer === question.options.find(o => o.correct)?.id;
+                    }
+                    feedbackText = isCorrect ? question.feedback.correct : question.feedback.incorrect;
+                }
+
+                if (isCorrect === undefined) return '';
+
+                const feedbackClass = isCorrect ? 'bg-green-100 border-green-500 text-green-800' : 'bg-red-100 border-red-500 text-red-800';
+                const feedbackIcon = isCorrect ? '✅' : '❌';
+                const feedbackTitle = isCorrect ? 'Muito bem!' : 'Resposta incorreta.';
+                
+                return `
+                    <div class="mt-4 p-4 rounded-lg border-l-4 ${feedbackClass} fade-in">
+                        <p class="font-bold">${feedbackIcon} ${feedbackTitle}</p>
+                        <p class="mt-2">${feedbackText}</p>
+                    </div>
+                `;
+            };
+
+            const renderActivity = () => {
+                const activityContent = () => {
+                    const isDisabled = appState.showModuleFeedback || isCompleted;
+
+                    switch (activity.type) {
+                        case 'problem':
+                            return `
+                                <p class="text-xl font-semibold mb-3">${activity.question}</p>
+                                ${activity.scenario ? `<div class="bg-amber-50 p-4 rounded-lg mb-6 border-l-4 border-amber-500"><p class="text-gray-700 italic">${activity.scenario}</p></div>` : ''}
+                                <div class="space-y-3">
+                                    ${activity.options.map(option => `
+                                        <button onclick="handleActivityAnswer('${activity.type}', '${option.id}')" 
+                                            ${isDisabled ? 'disabled' : ''} 
+                                            class="w-full text-left p-4 rounded-lg border-2 transition disabled:opacity-70 
+                                            ${appState.activityAnswers['problem'] === option.id && !appState.showModuleFeedback ? 'ring-2 ring-blue-500' : ''}
+                                            ${appState.showModuleFeedback && option.correct ? 'border-green-500 bg-green-50' : ''}
+                                            ${appState.showModuleFeedback && !option.correct && appState.activityAnswers['problem'] === option.id ? 'border-red-500 bg-red-50' : ''}
+                                            ${!appState.showModuleFeedback && !isCompleted ? 'border-gray-300 hover:border-blue-500' : 'border-gray-300'}">
+                                            <span class="font-bold">${option.id}.</span> ${option.text}
+                                        </button>
+                                    `).join('')}
+                                </div>
+                                ${!isDisabled ? '<button onclick="handleModuleSubmit()" class="mt-6 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold">Submeter Resposta</button>' : ''}
+                                ${renderFeedback()}
+                            `;
+                        case 'multiselect':
+                             const selectedAnswers = appState.activityAnswers['multiselect'] || [];
+                             return `
+                                <p class="text-xl font-semibold mb-3">${activity.question}</p>
+                                ${activity.scenario ? `<div class="bg-amber-50 p-4 rounded-lg mb-6 border-l-4 border-amber-500"><p class="text-gray-700 italic">${activity.scenario}</p></div>` : ''}
+                                <div class="space-y-3">
+                                    ${activity.options.map(option => {
+                                        const isSelected = selectedAnswers.includes(option.id);
+                                        let feedbackClass = 'border-gray-300';
+                                        if (appState.showModuleFeedback) {
+                                            if (option.correct) {
+                                                feedbackClass = 'border-green-500 bg-green-50';
+                                            } else if (isSelected && !option.correct) {
+                                                feedbackClass = 'border-red-500 bg-red-50';
+                                            }
+                                        } else if (!isCompleted) {
+                                            feedbackClass += ' hover:border-blue-500';
+                                        }
+                                        
+                                        return `
+                                        <button onclick="handleActivityAnswer('${activity.type}', '${option.id}')" 
+                                            ${isDisabled ? 'disabled' : ''} 
+                                            class="w-full text-left p-4 rounded-lg border-2 transition disabled:opacity-70 flex items-center gap-3 ${feedbackClass} ${isSelected && !appState.showModuleFeedback ? 'ring-2 ring-blue-500' : ''}">
+                                            <div class="w-6 h-6 border-2 ${isSelected ? 'bg-blue-600 border-blue-600' : 'border-gray-400'} rounded-md flex items-center justify-center text-white flex-shrink-0">
+                                                ${isSelected ? '✓' : ''}
+                                            </div>
+                                            <span><span class="font-bold">${option.id}.</span> ${option.text}</span>
+                                        </button>
+                                    `}).join('')}
+                                </div>
+                                ${!isDisabled ? '<button onclick="handleModuleSubmit()" class="mt-6 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold">Submeter Resposta</button>' : ''}
+                                ${renderFeedback()}
+                            `;
+                        case 'quiz':
+                            const currentQuestion = activity.questions[appState.currentModuleQuestionIndex];
+                            const currentAnswer = (appState.activityAnswers.quiz || {})[currentQuestion.id];
+                            const isLastQuestion = appState.currentModuleQuestionIndex === activity.questions.length - 1;
+                            const showSubmitButton = isLastQuestion && currentAnswer && !appState.showModuleFeedback;
+
+                            const renderQuizQuestion = (question) => {
+                                const isDisabled = currentAnswer !== undefined;
+                                switch(question.type) {
+                                    case 'image_mcq':
+                                        return `
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                ${question.options.map(option => `
+                                                    <button onclick="handleActivityAnswer('quiz', '${option.id}', '${question.id}')" 
+                                                            ${isDisabled ? 'disabled' : ''} 
+                                                            class="border-2 rounded-lg overflow-hidden transition disabled:opacity-70 focus:outline-none focus:ring-2 focus:ring-blue-500
+                                                            ${isDisabled && option.correct ? 'border-green-500 ring-2 ring-green-500' : ''}
+                                                            ${isDisabled && !option.correct && currentAnswer === option.id ? 'border-red-500 ring-2 ring-red-500' : ''}
+                                                            ${!isDisabled ? 'border-gray-300 hover:border-blue-500' : 'border-transparent'}">
+                                                        <img src="${option.img}" alt="${option.text}" class="w-full h-40 object-cover bg-gray-200">
+                                                        <p class="p-3 font-semibold text-center bg-gray-50">${option.text}</p>
+                                                    </button>
+                                                `).join('')}
+                                            </div>
+                                        `;
+                                    case 'true_false':
+                                        return `
+                                            <div class="flex gap-4 justify-center">
+                                                ${question.options.map(option => `
+                                                    <button onclick="handleActivityAnswer('quiz', '${option.id}', '${question.id}')" 
+                                                            ${isDisabled ? 'disabled' : ''} 
+                                                            class="w-full sm:w-48 p-4 rounded-lg border-2 font-bold text-lg transition disabled:opacity-70
+                                                            ${isDisabled && option.correct ? 'border-green-500 bg-green-50 text-green-800' : ''}
+                                                            ${isDisabled && !option.correct && currentAnswer === option.id ? 'border-red-500 bg-red-50 text-red-800' : ''}
+                                                            ${!isDisabled ? 'border-gray-300 hover:border-blue-500 hover:bg-blue-50' : 'border-gray-300'}">
+                                                        ${option.text}
+                                                    </button>
+                                                `).join('')}
+                                            </div>
+                                        `;
+                                    case 'fill_blank':
+                                        const blank = `<input type="text" id="fill-blank-${question.id}" 
+                                                               class="inline-block w-48 mx-2 p-1 text-center border-b-2 border-gray-400 focus:border-blue-500 focus:outline-none bg-transparent rounded-sm text-lg"
+                                                               ${isDisabled ? 'disabled' : ''} value="${currentAnswer || ''}">`;
+                                        return `
+                                            <div class="text-center text-xl">
+                                                <p>${question.question.replace('______', blank)}</p>
+                                            </div>
+                                        `;
+                                    case 'mcq':
+                                    default:
+                                        return `
+                                            <div class="space-y-3">
+                                                 ${question.options.map(option => `
+                                                    <button onclick="handleActivityAnswer('quiz', '${option.id}', '${question.id}')" 
+                                                        ${isDisabled ? 'disabled' : ''} 
+                                                        class="w-full text-left p-4 rounded-lg border-2 transition disabled:opacity-70 
+                                                            ${isDisabled && !option.correct && currentAnswer === option.id ? 'border-red-500 bg-red-50' : ''}
+                                                            ${isDisabled && option.correct ? 'border-green-500 bg-green-50' : ''}
+                                                            ${!isDisabled ? 'border-gray-300 hover:border-blue-500' : 'border-gray-300'}">
+                                                        <span class="font-bold">${option.id}.</span> ${option.text}
+                                                    </button>
+                                                `).join('')}
+                                            </div>
+                                        `;
+                                }
+                            };
+                            return `
+                                <div class="mb-4">
+                                    <p class="text-sm font-bold text-gray-500">Pergunta ${appState.currentModuleQuestionIndex + 1} de ${activity.questions.length}</p>
+                                    <p class="text-xl font-semibold">${currentQuestion.question}</p>
+                                </div>
+                                ${renderQuizQuestion(currentQuestion)}
+                                ${currentAnswer !== undefined ? renderFeedback(currentQuestion) : ''}
+
+                                <div class="mt-6 flex justify-end">
+                                    ${currentQuestion.type === 'fill_blank' && !currentAnswer ? `<button onclick="checkFillBlankAnswer('quiz', '${currentQuestion.id}')" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold">Verificar</button>` : ''}
+                                    ${!isLastQuestion && currentAnswer ? `<button onclick="nextModuleQuestion()" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold">Próxima Pergunta →</button>` : ''}
+                                    ${showSubmitButton ? `<button onclick="handleModuleSubmit()" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold">Finalizar Módulo</button>` : ''}
+                                </div>
+                            `;
+                        default: return 'Atividade não implementada.';
+                    }
+                };
+
+                return `
+                    <div>
+                        ${activity.image ? `
+                            <div class="mb-6 rounded-lg overflow-hidden h-56 bg-gray-200 shadow-md">
+                                ${renderImageWithPlaceholder(activity.image, 'Imagem da atividade')}
+                            </div>
+                        ` : ''}
+                        ${activityContent()}
+                    </div>
+                `;
+            };
+
+            return `
+                <div class="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 p-4 sm:p-8">
+                    <div class="max-w-4xl mx-auto">
+                        <button onclick="navigateTo('modules')" class="mb-6 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg flex items-center gap-2 transition">← Voltar aos Módulos</button>
+                        <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+                            <div class="bg-gradient-to-r ${module.color} p-6 text-white">
+                                 <div class="flex items-center gap-4">
+                                    <span class="text-4xl">${module.icon}</span>
+                                    <div><h2 class="text-3xl font-bold">${module.title}</h2><p class="text-white/90 mt-1">${module.content.intro}</p></div>
+                                </div>
+                            </div>
+                            <div class="p-6 sm:p-8">
+                                ${module.content.media ? `
+                                    <div class="mb-8">
+                                        ${module.content.media.type === 'video' ? `
+                                            <video controls class="w-full rounded-lg shadow-lg bg-black">
+                                                <source src="${module.content.media.src}" type="video/mp4">
+                                                O seu navegador não suporta o elemento de vídeo.
+                                            </video>
+                                        ` : ''}
+                                        ${module.content.media.type === 'audio' ? `
+                                            <audio controls class="w-full">
+                                                <source src="${module.content.media.src}" type="audio/mpeg">
+                                                O seu navegador não suporta o elemento de áudio.
+                                            </audio>
+                                        ` : ''}
+                                    </div>
+                                ` : ''}
+                                ${module.content.sections.map(section => `
+                                    <div class="mb-8">
+                                        <h3 class="text-2xl font-bold text-gray-800 mb-4">${section.title}</h3>
+                                        ${section.text ? `<p class="text-gray-700 leading-relaxed mb-4">${section.text}</p>` : ''}
+                                        ${section.items ? `<div class="space-y-3">${section.items.map(item => `
+                                            <div class="flex items-start gap-3 bg-gray-50 p-4 rounded-lg">
+                                                ${item.emoji ? `<span class="text-2xl mt-1">${item.emoji}</span>` : ''}
+                                                <div class="flex-1">
+                                                    ${item.title ? `<span class="font-bold text-gray-800">${item.title}: </span>` : ''}
+                                                    <span class="text-gray-700">${item.text}</span>
+                                                </div>
+                                            </div>`).join('')}</div>` : ''}
+                                    </div>`).join('')}
+                                 <div class="mt-12 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 sm:p-8 border-2 border-blue-200">
+                                    <h3 class="text-2xl font-bold text-blue-900 mb-4">🎯 Atividade Interativa</h3>
+                                    ${renderActivity()}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                ${renderFooter()}
+            `;
+        }
+
+        function renderQuiz() {
+             if (appState.showCertificate) {
+                const totalModuleScore = Object.values(appState.moduleProgress).reduce((sum, score) => sum + (Number(score) || 0), 0);
+                const maxModuleScore = modules.length * 100;
+                const correctQuizAnswersCount = finalQuiz.filter(q => checkQuizAnswer(q)).length;
+                const quizScore = Math.round((correctQuizAnswersCount / finalQuiz.length) * 100);
+                
+                const finalPercentage = Math.round(((totalModuleScore / maxModuleScore * 0.7) + (quizScore / 100 * 0.3)) * 100);
+
+                return `
+                    <div class="min-h-screen bg-gray-100 p-8 flex items-center justify-center">
+                        <div class="max-w-4xl w-full text-center fade-in">
+                            <div class="bg-white rounded-2xl shadow-2xl p-8 sm:p-12 border-4 border-amber-500 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')]">
+                                <h2 class="text-4xl font-bold text-amber-800 mb-2">Certificado de Conclusão</h2>
+                                <p class="text-gray-600 mb-8">Viagem pela História da Península Ibérica</p>
+                                <p class="text-lg text-gray-700 mb-4">Este certificado é concedido a</p>
+                                <p class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-700 to-yellow-800 mb-8 pb-2 border-b-2 border-amber-300 inline-block">${appState.userName}</p>
+                                <p class="text-lg text-gray-700 mb-6">pela conclusão bem-sucedida do percurso com uma pontuação final de:</p>
+                                <div class="text-7xl font-bold text-amber-600 mb-10">${finalPercentage}%</div>
+                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-left mb-8">
+                                    <div class="bg-amber-50 p-4 rounded-lg"><p class="font-bold text-gray-700">Pontuação Média dos Módulos:</p><p class="text-xl text-amber-700">${Math.round(totalModuleScore / modules.length)}%</p></div>
+                                    <div class="bg-amber-50 p-4 rounded-lg"><p class="font-bold text-gray-700">Pontuação do Questionário:</p><p class="text-xl text-amber-700">${quizScore}%</p></div>
+                                </div>
+                                <p class="text-gray-500 text-sm">Emitido em: ${new Date().toLocaleDateString('pt-PT')}</p>
+                                <div class="mt-10 pt-6 border-t border-amber-300 flex items-center justify-center gap-4 text-left">
+                                    <span class="text-5xl" aria-hidden="true">🗿</span>
+                                    <div>
+                                        <p class="font-bold text-amber-800">Selo de Conhecimento</p>
+                                        <p class="text-sm text-gray-600">História da Península Ibérica</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <button onclick="window.location.reload()" class="mt-8 px-8 py-4 bg-gray-600 text-white rounded-xl hover:bg-gray-700 transition">Recomeçar</button>
+                        </div>
+                    </div>
+                    ${renderFooter()}
+                `;
+            }
+
+            const allAnswered = Object.keys(appState.showQuizFeedback).length === finalQuiz.length;
+
+            return `
+                <div class="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 p-4 sm:p-8">
+                    <div class="max-w-4xl mx-auto">
+                        <button onclick="navigateTo('modules')" class="mb-6 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg flex items-center gap-2 transition">← Voltar aos Módulos</button>
+                        <div class="bg-white rounded-2xl shadow-2xl p-6 sm:p-8">
+                            <h2 class="text-4xl font-bold text-gray-800 mb-4 text-center">🏆 Questionário Final</h2>
+                            <p class="text-xl text-gray-600 mb-10 text-center">Teste os seus conhecimentos.</p>
+                            <div class="space-y-8">
+                                ${finalQuiz.map((q, idx) => `
+                                    <div class="bg-gray-50 p-6 rounded-xl border-l-4 border-amber-500">
+                                        <p class="text-lg font-semibold text-gray-800 mb-4">${idx + 1}. ${q.question}</p>
+                                        ${q.type === 'mcq' ? `
+                                            <div class="space-y-2">${(q.options || []).map(opt => `
+                                                <button onclick="handleQuizAnswer('${q.id}', '${opt.id}')" ${appState.showQuizFeedback[q.id] ? 'disabled' : ''} class="w-full text-left p-3 rounded-lg border-2 transition disabled:opacity-80 ${
+                                                    appState.showQuizFeedback[q.id] && opt.id === q.correct ? 'border-green-500 bg-green-100' :
+                                                    appState.showQuizFeedback[q.id] && opt.id !== q.correct && appState.quizAnswers[q.id] === opt.id ? 'border-red-500 bg-red-100' :
+                                                    'border-gray-300 hover:border-blue-500 hover:bg-blue-50'
+                                                }"><span class="font-bold">${opt.id}.</span> ${opt.text}</button>
+                                            `).join('')}</div>
+                                        ` : ''}
+                                        ${q.type === 'truefalse' ? `
+                                            <div class="flex gap-4">${(q.options || []).map(opt => `
+                                                <button onclick="handleQuizAnswer('${q.id}', '${opt.id}')" ${appState.showQuizFeedback[q.id] ? 'disabled' : ''} class="flex-1 p-3 rounded-lg border-2 font-bold transition disabled:opacity-80 ${
+                                                    appState.showQuizFeedback[q.id] && opt.id === q.correct ? 'border-green-500 bg-green-100' :
+                                                    appState.showQuizFeedback[q.id] && opt.id !== q.correct && appState.quizAnswers[q.id] === opt.id ? 'border-red-500 bg-red-100' :
+                                                    'border-gray-300 hover:border-blue-500 hover:bg-blue-50'
+                                                }">${opt.text}</button>
+                                            `).join('')}</div>
+                                        ` : ''}
+                                        ${appState.showQuizFeedback[q.id] ? `
+                                            <div class="mt-4 p-3 rounded-lg ${checkQuizAnswer(q) ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                                <p><span class="font-bold">${checkQuizAnswer(q) ? '✓' : '✗'}</span> ${checkQuizAnswer(q) ? q.feedback.correct : q.feedback.incorrect}</p>
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                            ${allAnswered ? `
+                                <div class="mt-12 text-center bg-gradient-to-r from-amber-50 to-yellow-100 p-8 rounded-2xl border-2 border-amber-300">
+                                    <h3 class="text-2xl font-bold text-gray-800 mb-2">Parabéns, concluiu o questionário!</h3>
+                                    <p class="text-gray-700 mb-6">Insira o seu nome para gerar o seu certificado.</p>
+                                    <input type="text" value="${appState.userName}" oninput="appState.userName = this.value" placeholder="O seu nome completo" class="w-full max-w-md mx-auto p-4 border-2 border-amber-400 rounded-lg text-center text-lg focus:ring-2 focus:ring-amber-500" />
+                                    <button onclick="handleGenerateCertificate()" class="mt-6 px-8 py-4 bg-gradient-to-r from-amber-600 to-yellow-700 text-white text-xl font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition">Gerar Certificado</button>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+                ${renderFooter()}
+            `;
+        }
+
+        // --- EVENT HANDLERS & LOGIC ---
+        function toggleZoomModal(src) {
+            const modal = document.getElementById('zoom-modal');
+            const img = document.getElementById('zoomed-image');
+            if (src && modal && img) {
+                img.src = src;
+                modal.classList.add('active');
+            } else if (modal) {
+                modal.classList.remove('active');
+                img.src = ''; // Clear src to avoid showing old image briefly
+            }
+        }
+        
+        function handleStoryNav(direction) {
+            if (direction === 'next' && appState.storyPageIndex < storyPages.length - 1) {
+                appState.storyPageIndex++;
+            } else if (direction === 'prev' && appState.storyPageIndex > 0) {
+                appState.storyPageIndex--;
+            }
+            renderApp();
+        }
+
+        function handleActivityAnswer(type, answer, questionId = null) {
+            if (type === 'problem') {
+                appState.activityAnswers['problem'] = answer;
+            } else if (type === 'multiselect') {
+                if (!appState.activityAnswers['multiselect']) {
+                    appState.activityAnswers['multiselect'] = [];
+                }
+                const currentAnswers = appState.activityAnswers['multiselect'];
+                const index = currentAnswers.indexOf(answer);
+                if (index > -1) {
+                    currentAnswers.splice(index, 1); // Deselect
+                } else {
+                    currentAnswers.push(answer); // Select
+                }
+            } else if (type === 'quiz' && questionId) {
+                 if (!appState.activityAnswers.quiz) {
+                    appState.activityAnswers.quiz = {};
+                }
+                appState.activityAnswers.quiz[questionId] = answer;
+            }
+            renderApp();
+        }
+        
+        function checkFillBlankAnswer(type, questionId) {
+            const input = document.getElementById(`fill-blank-${questionId}`);
+            if (input) {
+                handleActivityAnswer(type, input.value, questionId);
+            }
+        }
+
+        function nextModuleQuestion() {
+            const module = modules[appState.currentModuleIndex];
+            if (appState.currentModuleQuestionIndex < module.content.activity.questions.length - 1) {
+                appState.currentModuleQuestionIndex++;
+                renderApp();
+            }
+        }
+        
+        function checkModuleAnswer(activity, answer) {
+            if (activity.type === 'problem') {
+                const selectedOption = activity.options.find(opt => opt.id === answer);
+                return selectedOption?.correct === true;
+            } else if (activity.type === 'multiselect') {
+                const correctAnswers = activity.correct;
+                const sortedSelected = [...(answer || [])].sort();
+                const sortedCorrect = [...correctAnswers].sort();
+                return sortedSelected.length === sortedCorrect.length && sortedSelected.every((value, index) => value === sortedCorrect[index]);
+            }
+            return false;
+        }
+
+        function handleModuleSubmit() {
+            const module = modules[appState.currentModuleIndex];
+            if (!module || appState.showModuleFeedback) return;
+            
+            appState.showModuleFeedback = true;
+            
+            let score = 0;
+            const activity = module.content.activity;
+
+            if (activity.type === 'problem' || activity.type === 'multiselect') {
+                const allAnswers = appState.activityAnswers[activity.type];
+                if (checkModuleAnswer(activity, allAnswers)) {
+                    score = 100;
+                }
+            } else if (activity.type === 'quiz') {
+                let correctCount = 0;
+                const userAnswers = appState.activityAnswers.quiz || {};
+                activity.questions.forEach(q => {
+                    const userAnswer = userAnswers[q.id];
+                    if (!userAnswer) return;
+
+                    if (q.type === 'fill_blank') {
+                        if (userAnswer.trim().toLowerCase() === q.correct.trim().toLowerCase()) {
+                            correctCount++;
+                        }
+                    } else { // mcq, true_false, image_mcq
+                        const correctOptionId = q.options.find(opt => opt.correct)?.id;
+                        if (userAnswer === correctOptionId) {
+                            correctCount++;
+                        }
+                    }
+                });
+                score = Math.round((correctCount / activity.questions.length) * 100);
+            }
+            
+            appState.moduleProgress[module.id] = score;
+            renderApp();
+        }
+
+        function handleQuizAnswer(questionId, answer) {
+            if (!answer || appState.showQuizFeedback[questionId]) return;
+            appState.quizAnswers[questionId] = answer;
+            appState.showQuizFeedback[questionId] = true;
+            renderApp();
+        }
+
+        function checkQuizAnswer(question) {
+            const answer = appState.quizAnswers[question.id];
+            if (!answer) return false;
+            return answer.toLowerCase().trim() === question.correct.toLowerCase().trim();
+        }
+
+        function handleGenerateCertificate() {
+            if (appState.userName.trim() !== "") {
+                appState.showCertificate = true;
+                renderApp();
+            } else {
+                alert("Por favor, insira o seu nome para gerar o certificado.");
+            }
+        }
+
+        // --- INITIAL RENDER ---
+        document.addEventListener('DOMContentLoaded', renderApp);
+
+    </script>
+</body>
+</html>
