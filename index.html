@@ -179,7 +179,7 @@
                         { id: 'q1', type: 'mcq', question: 'Qual foi um dos principais motivos que, segundo o vídeo, levou os Romanos a invadir a Península Ibérica?', options: [ { id: 'A', text: 'As ricas minas de ouro e prata.', correct: true }, { id: 'B', text: 'A curiosidade científica sobre a geografia local.', correct: false }, { id: 'C', text: 'Uma aliança militar pré-existente com os Lusitanos.', correct: false }, { id: 'D', text: 'A busca por newas rotas comerciais para a Índia.', correct: false } ], feedback: { correct: 'Correto! As vastas riquezas minerais da Península Ibérica, especialmente o ouro e a prata, foram um enorme atrativo para a República Romana.', incorrect: 'Incorreto. A principal motivação foi económica, impulsionada pelas ricas minas de metais preciosos da Península.' } },
                         { id: 'q2', type: 'mcq', question: 'Que rival de Roma já tinha uma forte presença na Península e foi o motivo inicial para a intervenção romana (Segunda Guerra Púnica)?', options: [ { id: 'A', text: 'Os Gregos', correct: false }, { id: 'B', text: 'Os Egípcios', correct: false }, { id: 'C', text: 'Os Cartagineses', correct: true }, { id: 'D', text: 'Os Persas', correct: false } ], feedback: { correct: 'Exato! A luta contra Cartago, liderada por Aníbal, foi o que levou as legiões romanas pela primeira vez à Península.', incorrect: 'A resposta correta é Cartagineses. A Segunda Guerra Púnica entre Roma e Cartago foi o gatilho da conquista.' } },
                         { id: 'q3', type: 'mcq', question: 'O processo de adotar a língua, leis e costumes romanos é conhecido como:', options: [ { id: 'A', text: 'Globalização', correct: false }, { id: 'B', text: 'Romanização', correct: true }, { id: 'C', text: 'Urbanização', correct: false }, { id: 'D', text: 'Democratização', correct: false } ], feedback: { correct: 'Muito bem! A Romanização foi o processo, lento mas profundo, de integração cultural dos povos conquistados no mundo romano.', incorrect: 'O termo correto é Romanização. Foi através deste processo que a cultura romana se espalhou pelo império.' } },
-                        { id: 'q4', type: 'image_mcq', question: 'Qual das seguintes imagens representa uma obra de engenharia romana mencionada no vídeo?', options: [ { id: 'A', img: './assets/image_aqueduto.jpg', text: 'Aqueduto', correct: true }, { id: 'B', img: './assets/image_piramide.jpg', text: 'Pirâmide', correct: false }, { id: 'C', img: './assets/image_catedral.jpg', text: 'Catedral Gótica', correct: false }, { id: 'D', img: './assets/image_ponte_moderna.jpg', text: 'Ponte Moderna', correct: false } ], feedback: { correct: 'Correto! Os aquedutos, como o de Segóvia, são um exemplo espetacular da engenharia romana, construídos para transportar água para as cidades.', incorrect: 'A resposta correta é o Aqueduto. As pirâmides são egípcias, as catedrais góticas são medievais e a ponte é contemporânea.' } },
+                        { id: 'q4', type: 'image_mcq', question: 'Qual das seguintes imagens representa uma obra de engenharia romana mencionada no vídeo (um aqueduto)?', options: [ { id: 'A', img: './assets/image_aqueduto.jpg', text: 'Aqueduto', correct: true }, { id: 'B', img: './assets/image_piramide.jpg', text: 'Pirâmide', correct: false }, { id: 'C', img: './assets/image_catedral.jpg', text: 'Catedral Gótica', correct: false }, { id: 'D', img: './assets/image_ponte_moderna.jpg', text: 'Ponte Moderna', correct: false } ], feedback: { correct: 'Correto! Os aquedutos, como o de Segóvia, são um exemplo espetacular da engenharia romana, construídos para transportar água para as cidades.', incorrect: 'A resposta correta é o Aqueduto. As pirâmides são egípcias, as catedrais góticas são medievais e a ponte é contemporânea.' } },
                         { id: 'q5', type: 'true_false', question: 'A conquista romana da Península Ibérica foi rápida e durou apenas alguns anos.', options: [ { id: 'V', text: 'Verdadeiro', correct: false }, { id: 'F', text: 'Falso', correct: true } ], feedback: { correct: 'Isso mesmo, é falso! A conquista foi um processo longo e difícil que durou quase 200 anos, de 218 a.C. a 19 a.C., devido à forte resistência dos povos locais.', incorrect: 'Incorreto. A afirmação é falsa. A conquista foi um processo extremamente longo, demorando cerca de 200 anos a ser concluído.' } },
                         { id: 'q6', type: 'fill_blank', question: 'A língua que os romanos introduziram, e que é a base da língua portuguesa, é o ______.', correct: 'Latim', feedback: { correct: 'Perfeito! O Latim vulgar, falado pelos soldados e colonos romanos, deu origem ao português e a muitas outras línguas românicas.', incorrect: 'A resposta correta é Latim. É a herança linguística mais importante que Roma nos deixou.' } }
                     ]
@@ -236,7 +236,7 @@
         
         // --- APPLICATION STATE ---
         let appState = {
-            page: 'intro', // 'intro', 'story', 'video', 'podcast', 'modules', 'module', 'quiz'
+            page: 'intro', // 'intro', 'story', 'video', 'podcast', 'modules', 'module', 'quiz', 'search'
             storyPageIndex: 0,
             currentModuleIndex: null,
             moduleProgress: {}, // { moduleId: score_percentage }
@@ -249,9 +249,132 @@
             showQuizFeedback: {},
             userName: '',
             showCertificate: false,
+            // Search State
+            searchQuery: '',
+            searchResults: []
         };
 
         const root = document.getElementById('root');
+        
+        // --- SEARCH LOGIC ---
+        function performSearch(query) {
+            if (!query || query.trim() === '') return [];
+            const term = query.toLowerCase();
+            const results = [];
+
+            // Search Stories
+            storyPages.forEach((page, index) => {
+                if (page.title.toLowerCase().includes(term) || page.text.toLowerCase().includes(term)) {
+                    results.push({
+                        type: 'story',
+                        index: index,
+                        title: `História: ${page.title}`,
+                        snippet: getSnippet(page.text, term)
+                    });
+                }
+            });
+
+            // Search Modules
+            modules.forEach((mod, index) => {
+                let match = false;
+                let snippet = '';
+                
+                if (mod.title.toLowerCase().includes(term)) {
+                    match = true;
+                    snippet = mod.content.intro;
+                } else if (mod.content.intro.toLowerCase().includes(term)) {
+                    match = true;
+                    snippet = getSnippet(mod.content.intro, term);
+                } else {
+                    // Search sections
+                     for (const section of mod.content.sections) {
+                        if (section.title.toLowerCase().includes(term)) {
+                            match = true;
+                            snippet = section.text || '';
+                            break;
+                        }
+                        if (section.text && section.text.toLowerCase().includes(term)) {
+                            match = true;
+                            snippet = getSnippet(section.text, term);
+                            break;
+                        }
+                        if (section.items) {
+                            for (const item of section.items) {
+                                if (item.title && item.title.toLowerCase().includes(term)) {
+                                    match = true;
+                                    snippet = item.text;
+                                    break;
+                                }
+                                if (item.text && item.text.toLowerCase().includes(term)) {
+                                    match = true;
+                                    snippet = getSnippet(item.text, term);
+                                    break;
+                                }
+                            }
+                        }
+                        if (match) break;
+                    }
+                }
+
+                if (match) {
+                    results.push({
+                        type: 'module',
+                        index: index,
+                        title: mod.title,
+                        snippet: snippet
+                    });
+                }
+            });
+
+            // Search Video/Podcast
+            [videoData, podcastData].forEach(item => {
+                 if (item.title.toLowerCase().includes(term) || item.content.intro.toLowerCase().includes(term)) {
+                    results.push({
+                        type: item.id === 'video_page' ? 'video' : 'podcast',
+                        title: item.title,
+                        snippet: getSnippet(item.content.intro, term)
+                    });
+                 }
+            });
+
+            return results;
+        }
+
+        function getSnippet(htmlContent, term) {
+            if (!htmlContent) return '';
+            const div = document.createElement("div");
+            div.innerHTML = htmlContent;
+            const text = div.textContent || div.innerText || "";
+            const lowerText = text.toLowerCase();
+            const lowerTerm = term.toLowerCase();
+            const index = lowerText.indexOf(lowerTerm);
+            
+            if (index === -1) return text.substring(0, 150) + '...';
+            
+            const start = Math.max(0, index - 60);
+            const end = Math.min(text.length, index + term.length + 60);
+            return (start > 0 ? '...' : '') + text.substring(start, end) + (end < text.length ? '...' : '');
+        }
+
+        function handleSearch(query) {
+            if(!query.trim()) return;
+            appState.searchQuery = query;
+            appState.searchResults = performSearch(query);
+            navigateTo('search');
+        }
+
+        function handleSearchResultClick(type, index) {
+            if (type === 'story') {
+                appState.storyPageIndex = index;
+                navigateTo('story');
+            } else if (type === 'module') {
+                navigateTo('module', index);
+            } else if (type === 'video') {
+                navigateTo('video');
+            } else if (type === 'podcast') {
+                navigateTo('podcast');
+            }
+        }
 
         // --- NAVIGATION & RENDERING ---
         function navigateTo(newPage, data = null) {
@@ -281,6 +404,11 @@
                 appState.userName = '';
                 appState.showCertificate = false;
             }
+            
+            if(newPage !== 'search') {
+                // Optional: clear search query if desired, but keeping it might be better UX
+            }
+
             window.scrollTo(0, 0);
             renderApp();
         }
@@ -295,6 +423,7 @@
                 case 'modules': content = renderModuleList(); break;
                 case 'module': content = renderModuleDetail(); break;
                 case 'quiz': content = renderQuiz(); break;
+                case 'search': content = renderSearchPage(); break;
                 default: content = renderIntro();
             }
             root.innerHTML = renderNavbar() + `<main class="pt-20 fade-in">${content}</main>`;
@@ -329,6 +458,16 @@
                                 ${navLink('podcast', 'Podcast')}
                                 ${navLink('modules', 'Módulos', ['module'])}
                                 ${navLink('quiz', 'Questionário')}
+                                <li>
+                                    <div class="relative">
+                                         <input type="text" 
+                                            placeholder="Pesquisar..." 
+                                            class="pl-8 pr-3 py-1 rounded-full border border-gray-300 focus:border-amber-500 focus:outline-none text-sm w-32 focus:w-48 transition-all"
+                                            onkeydown="if(event.key === 'Enter') handleSearch(this.value)"
+                                         >
+                                         <span class="absolute left-2.5 top-1.5 text-gray-400 text-sm">🔍</span>
+                                    </div>
+                                </li>
                             </ul>
                         </div>
                     </nav>
@@ -348,6 +487,33 @@
         
         function renderImageWithPlaceholder(src, alt) {
             return `<div class="w-full h-full cursor-zoom-in" onclick="toggleZoomModal('${src}')"><img src="${src}" alt="${alt}" class="w-full h-full object-cover" loading="lazy" /></div>`;
+        }
+
+        function renderSearchPage() {
+            const results = appState.searchResults;
+            return `
+                <div class="min-h-screen bg-gray-50 p-8 sm:p-12">
+                    <div class="max-w-4xl mx-auto">
+                         <button onclick="navigateTo('intro')" class="mb-6 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg flex items-center gap-2 transition">← Voltar</button>
+                        <h2 class="text-3xl font-bold text-gray-800 mb-6">Resultados da Pesquisa por "${appState.searchQuery}"</h2>
+                        ${results.length === 0 ? 
+                            '<div class="bg-white p-8 rounded-xl shadow text-center text-gray-600"><p class="text-xl">Nenhum resultado encontrado.</p><p class="mt-2">Tente usar palavras-chave diferentes.</p></div>' : 
+                            `<div class="space-y-4">
+                                ${results.map(result => `
+                                    <div onclick="handleSearchResultClick('${result.type}', ${result.index})" class="bg-white p-6 rounded-xl shadow-md cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-200 border-l-4 border-amber-500 group">
+                                        <div class="flex justify-between items-start">
+                                            <h3 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-amber-700">${result.title}</h3>
+                                            <span class="text-xs font-bold uppercase text-amber-600 bg-amber-100 px-2 py-1 rounded">${result.type}</span>
+                                        </div>
+                                        <p class="text-gray-600">${result.snippet}</p>
+                                    </div>
+                                `).join('')}
+                            </div>`
+                        }
+                    </div>
+                </div>
+                ${renderFooter()}
+            `;
         }
 
         function renderIntro() {
