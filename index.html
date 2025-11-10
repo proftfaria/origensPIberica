@@ -35,6 +35,21 @@
         .cursor-zoom-in {
             cursor: zoom-in;
         }
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #fef3c7; /* amber-100 */
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #d97706; /* amber-600 */
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #b45309; /* amber-700 */
+        }
     </style>
 </head>
 <body>
@@ -51,12 +66,101 @@
     <script>
         // --- DATA CONSTANTS ---
         const storyPages = [
-            { image: './assets/image1.jpg', title: 'Uma Terra Antiga', text: 'Bem-vindo a uma viagem no tempo pela Península Ibérica. Antes dos reinos e das nações, esta terra foi o lar de povos cujas histórias estão gravadas na pedra e na paisagem. Vamos descobrir os seus segredos.' },
-            { image: './assets/image2.jpg', title: 'A Centelha da Civilização', text: 'As primeiras comunidades eram recoletoras e nómadas. A descoberta do fogo foi uma revolução: permitiu cozinhar alimentos, aquecer, iluminar as grutas e afastar os animais ferozes, tornando a sobrevivência menos árdua.' },
-            { image: './assets/image3.jpg', title: 'Gigantes de Pedra', text: 'Com a agricultura, os povos tornaram-se sedentários. Começaram a honrar os seus mortos e as forças da natureza de formas monumentais, erguendo antas, menires e cromeleques. Estes construtores megalíticos deixaram um legado de mistério e engenharia ancestral.' },
-            { image: './assets/image4.jpg', title: 'Um Mosaico de Povos', text: 'A Península era um caldeirão de culturas. Os Iberos, no sul e leste; os Celtas, no norte e oeste. Do seu encontro nasceram os Celtiberos e, entre eles, os bravos Lusitanos, um povo de pastores e guerreiros que amava a liberdade acima de tudo.' },
-            { image: './assets/image5.jpg', title: 'A Chegada das Águias', text: 'Em 218 a.C., um novo poder chegou pelo mar. As legiões de Roma desembarcaram, atraídas pelas ricas minas e pela posição estratégica da Península. A conquista seria longa e difícil, marcada pela feroz resistência dos povos locais, como os Lusitanos liderados por Viriato.' },
-            { image: './assets/image6.jpg', title: 'O Legado de Roma', text: 'Após a conquista, veio a romanização. Estradas, pontes, cidades, o latim, o direito e, eventualmente, uma nova fé, o Cristianismo. O legado de Roma moldou a Península de forma tão profunda que as suas fundações perduram até hoje no nosso idioma, leis e cultura.' }
+            { 
+                image: './assets/image1.jpg', 
+                title: 'Uma Terra Antiga', 
+                text: `Bem-vindo a uma viagem no tempo pela Península Ibérica. Antes dos reinos e das nações, esta terra foi o lar de povos cujas histórias estão gravadas na pedra e na paisagem.<br><br>
+                Desde os primórdios da ocupação humana, a Península Ibérica afirmou-se como um território de confluência cultural, um mosaico geográfico e humano moldado por vagas sucessivas de povos e influências. A sua posição estratégica, como ponte entre o Atlântico e o Mediterrâneo e entre a Europa e África, tornou-a um palco privilegiado para o desenvolvimento de sociedades complexas, muito antes da chegada das legiões romanas.<br><br>
+                Vamos analisar as contribuições tecnológicas, sociais e culturais cumulativas dos seus primeiros habitantes. Partindo das comunidades recoletoras do Paleolítico, passando pela revolução agropastoril do Neolítico e culminando nas sofisticadas sociedades da Idade dos Metais, como os Iberos e os Celtas, traçaremos um percurso que revela uma notável capacidade de inovação e adaptação.<br><br>
+                A identidade peninsular foi forjada não apenas através de uma longa e rica evolução interna, mas também pela absorção seletiva de influências externas significativas. Este processo criou uma base cultural e social resiliente, que, longe de ser uma tábua rasa, interagiu profundamente com a posterior conquista romana, moldando a singularidade da civilização que daí emergiu.<br><br>
+                Vamos descobrir os seus segredos!` 
+            },
+            { 
+                image: './assets/image2.jpg', 
+                title: 'A Centelha da Civilização', 
+                text: `As fundações da história peninsular foram lançadas pelas suas primeiras comunidades. A longa jornada desde um modo de vida recoletor e nómada até à estabilidade da produção de alimentos representou a primeira grande transformação social e tecnológica. A transição para a agricultura, iniciada há cerca de 6.000 anos, não só alterou a relação do ser humano com o meio, mas também estabeleceu a base sobre a qual todas as sociedades subsequentes foram construídas.<br><br>
+                As primeiras comunidades humanas que habitaram a Península Ibérica viviam num estado de nomadismo, deslocando-se em clãs em busca de sustento. A sua subsistência dependia inteiramente do que a Natureza lhes proporcionava, através de estratégias baseadas na caça de animais de diferentes portes, na pesca e na recoleção de frutos, sementes e raízes. Esta economia recoletora exigia um profundo conhecimento dos ciclos sazonais e das rotas migratórias dos animais. O desenvolvimento destas comunidades foi impulsionado por duas inovações tecnológicas cruciais:<br><br>
+                <b>- O domínio do fogo:</b> A capacidade de produzir e controlar o fogo representou uma autêntica revolução. Permitiu cozinhar os alimentos, o que teve consequências fisiológicas importantes, mas também serviu para aquecer, iluminar as grutas, afastar predadores e endurecer as pontas de madeira das suas armas.<br><br>
+                <b>- O fabrico de instrumentos:</b> Utilizando pedra lascada, osso e madeira, estes primeiros grupos fabricavam uma variedade de ferramentas essenciais para a sua sobrevivência. Bifaces, arpões, anzóis e agulhas eram utilizados para cortar carne, pescar, tratar peles e coser vestuário, demonstrando uma crescente sofisticação técnica.<br><br>
+                Para além da luta pela sobrevivência, estas comunidades desenvolveram formas complexas de expressão simbólica. A arte rupestre, encontrada em locais emblemáticos como as grutas de Altamira (Espanha) e os abrigos de Vila Nova de Foz Coa (Portugal), é o testemunho mais eloquente. Representando sobretudo animais e cenas de caça, acredita-se que esta arte desempenhava uma função mágica e religiosa, com o intuito de garantir o sucesso nas caçadas e proteger o grupo.` 
+            },
+            { 
+                image: './assets/image3.jpg', 
+                title: 'Gigantes de Pedra', 
+                text: `Há cerca de 6.000 anos, um aquecimento geral do clima na Península Ibérica permitiu o aparecimento de novas espécies vegetais e animais, catalisando uma mudança fundamental. As comunidades começaram a transitar de uma economia recoletora para uma economia produtora, com o surgimento da agricultura e da domesticação de animais. Esta transformação levou ao abandono gradual do nomadismo e à sedentarização, com a construção dos primeiros aldeamentos em locais fixos. A sedentarização foi acompanhada por um notável avanço tecnológico, que respondeu às novas necessidades de uma sociedade agropastoril:<br><br>
+                <b>- Novos instrumentos de pedra polida:</b> Para trabalhar a terra, desenvolveram-se ferramentas mais eficazes, como enxadas, foices e os primeiros arados, que permitiram um melhor aproveitamento dos solos.<br>
+                <b>- A Olaria e a Cestaria:</b> A necessidade de armazenar cereais e outros alimentos impulsionou o desenvolvimento da olaria (vasos de cerâmica) e da cestaria, essenciais para a conservação dos excedentes.<br>
+                <b>- A Tecelagem:</b> Com a domesticação de animais como a ovelha, a tecelagem surgiu como uma nova atividade para a produção de tecidos e vestuário, utilizando teares primitivos.<br>
+                <b>- A invenção da roda:</b> Esta inovação transformou completamente os transportes, facilitando o movimento de bens e produtos e potenciando as trocas entre comunidades.<br><br>
+                A crescente complexidade social e religiosa das comunidades agropastoris manifestou-se na construção de monumentos com grandes pedras, um fenómeno conhecido como <b>megalitismo</b>. Estas construções, que exigiam um esforço coletivo e uma organização social considerável, serviam como espaços funerários ou como locais de culto ligados às forças da Natureza, das quais a agricultura dependia vitalmente:<br><br>
+                <b>Menires:</b> grandes pedras isoladas, cravadas verticalmente no solo. Acredita-se que estavam associadas a cultos agrários e de fertilidade, dedicados à Natureza.<br>
+                <b>Antas ou Dólmenes:</b> construções funerárias coletivas, formadas por grandes pedras verticais (esteios) que sustentam uma laje horizontal (tampa), formando uma câmara onde eram depositados os mortos juntamente com os seus pertences (armas, adornos, cerâmica).<br>
+                <b>Cromeleques:</b> conjuntos de menires dispostos em círculo. A sua função está provavelmente ligada ao culto da Natureza e à observação dos astros, servindo como santuários ao ar livre.` 
+            },
+            { 
+                image: './assets/image4.jpg', 
+                title: 'Um Mosaico de Povos', 
+                text: `O domínio da metalurgia representou um salto tecnológico que acelerou a complexificação social, acentuou a diferenciação cultural e consolidou o poder de elites guerreiras e políticas. A riqueza mineral da Península Ibérica, em particular os seus depósitos de cobre, estanho, prata e ouro, não só impulsionou o desenvolvimento interno, mas também atraiu povos comerciantes do Mediterrâneo, como Fenícios, Gregos e Cartagineses, que foram cruciais para moldar a diversidade étnica e cultural da Península na era pré-romana.<br>
+                A Península era um caldeirão de culturas. Os Iberos, no sul e leste; os Celtas, no norte e oeste. Do seu encontro nasceram os Celtiberos e, entre eles, os bravos Lusitanos, um povo de pastores e guerreiros que amava a liberdade acima de tudo.<br><br>
+
+                <h3 class="font-bold text-amber-800 text-lg">4.1 Os Iberos: Urbanismo e Influência Mediterrânica</h3>
+                Os Iberos, provavelmente originários do Norte de África, estabeleceram-se no sul e leste da Península, numa região aberta às influências mediterrânicas. Caracterizados fisicamente como sendo morenos e de estatura média, desenvolveram uma das culturas mais avançadas do território. A sua organização social era notavelmente sofisticada. Viviam em povoações fortificadas, conhecidas como "oppida", que demonstram um elevado nível de planeamento urbano, estabelecendo uma base de assentamento que os Romanos, mais tarde, iriam adaptar e expandir. A sociedade ibera era estratificada, com uma clara divisão entre governantes, nobres, artesãos e escravos. No campo tecnológico, dominaram a metalurgia do cobre e do bronze e exploraram intensivamente as minas de prata. Por influência do contacto com os Gregos, adotaram o cultivo da vinha e da oliveira. A sua arte, de grande qualidade e beleza, é exemplificada pela célebre "Dama de Elche", um busto que revela uma forte influência estilística grega.<br><br>
+
+                <h3 class="font-bold text-amber-800 text-lg">4.2 Os Celtas: Cultura Castreja e o Domínio do Ferro</h3>
+                Provenientes da Europa Central, os Celtas fixaram-se predominantemente no noroeste da Península Ibérica. Fisicamente, eram descritos como altos, de pele clara, louros e de olhos claros. Este povo aguerrido introduziu uma tecnologia que representou uma vantagem disruptiva sobre os povos locais: o domínio do ferro. Com este metal, fabricaram armas mais resistentes e ferramentas agrícolas mais duradouras, conferindo-lhes uma superioridade militar e económica relativa às tecnologias da Idade do Bronze. O seu modelo de povoamento, conhecido como "cultura castreja", baseava-se em povoados fortificados situados no cimo de montes, os castros ou citânias. Estes locais, como a imponente Citânia de Briteiros, estavam rodeados por muralhas defensivas e organizados em clãs, refletindo uma sociedade guerreira e bem estruturada para a defesa do seu território. A fusão gradual entre Celtas e Iberos em zonas de contacto deu origem aos Celtiberos.<br><br>
+
+                <h3 class="font-bold text-amber-800 text-lg">4.3 Intercâmbio Cultural: Fenícios, Gregos e Cartagineses</h3>
+                Entre os séculos XI e III a.C., a Península Ibérica tornou-se um ponto de atração para os povos mais desenvolvidos do Mediterrâneo. Atraídos pelas suas vastas riquezas minerais — ouro, prata, cobre e estanho —, Fenícios, Gregos e Cartagineses estabeleceram feitorias comerciais e colónias ao longo da costa sul e leste. Este contacto não foi meramente comercial; trouxe consigo inovações que enriqueceram permanentemente a cultura dos povos peninsulares.<br>
+                As suas contribuições mais duradouras podem ser sintetizadas da seguinte forma:<br>
+                <b>1. Fenícios:</b> Foram responsáveis pela introdução da escrita alfabética, um sistema fonético muito mais simples e acessível que os sistemas de escrita anteriores, revolucionando a comunicação e a administração.<br>
+                <b>2. Gregos:</b> Generalizaram a utilização da moeda nas trocas comerciais, substituindo progressivamente a economia de troca direta e facilitando o comércio a longa distância.<br>
+                <b>3. Cartagineses:</b> Divulgaram a técnica de conservação de alimentos com sal, um método crucial para a preservação de peixe e carne, que permitiu o armazenamento de alimentos por longos períodos e impulsionou o comércio de produtos alimentares.<br><br>
+
+                <h3 class="font-bold text-amber-800 text-lg">4.4 Os Lusitanos: Símbolo da Resistência Peninsular</h3>
+                Desta complexa mescla de povos autóctones e influências mediterrânicas surgiu uma das tribos mais resilientes e emblemáticas da Península: os Lusitanos, que se tornariam o maior obstáculo à expansão romana.<br>
+                Os Lusitanos, um poderoso conjunto de tribos de provável origem indo-europeia e possivelmente pré-celta, transcenderam o seu estatuto tribal para se tornarem o principal arquétipo da resistência à expansão romana. O seu território, estrategicamente localizado entre os rios Douro e Tejo, era caracterizado por um relevo montanhoso que souberam utilizar com mestria para se oporem ao mais poderoso exército da Antiguidade. A sua feroz oposição, que durou décadas, transformou-os num símbolo duradouro da luta pela independência.<br><br>
+
+                <b>4.4.1 Sociedade e Modo de Vida</b><br>
+                Graças aos relatos do geógrafo grego Estrabão, possuímos um retrato vívido dos costumes lusitanos. A sua sociedade, embora simples, era regida por tradições bem definidas e adaptada a um ambiente austero.<br>
+                <b>Dieta e Hábitos Sociais:</b> A sua alimentação baseava-se em produtos locais, como o pão feito de bolota moída. Bebiam uma espécie de cerveja, pois o vinho era raro e consumido apenas em festins familiares. Nestes banquetes, sentavam-se em bancos ao longo das paredes, e as iguarias eram partilhadas enquanto dançavam ao som de flautas e trombetas.<br>
+                <b>Aparência e Vestuário:</b> Usavam os cabelos compridos e soltos, como as mulheres, prendendo-os com uma faixa na testa durante os combates. Praticavam exercícios físicos como o pugilato e as corridas, preparando-se desde cedo para a guerra.<br><br>
+
+                <b>4.4.2 Táticas e Equipamento Militar</b><br>
+                A reputação militar dos Lusitanos não assentava em grandes exércitos organizados, mas sim na sua extraordinária proficiência em táticas de guerrilha. Estrabão descreve-os como "hábeis em armar emboscadas e descobrir pistas", destacando a sua agilidade e rapidez. Entravam em combate soltando cânticos guerreiros e fazendo uma grande algazarra para infundir terror no inimigo. Evitavam o confronto direto, preferindo emboscadas e ataques surpresa, e demonstravam grande adaptabilidade, chegando a transportar um segundo soldado a pé na garupa dos seus cavalos. O seu equipamento era leve e adaptado a este estilo de combate:<br>
+                <i>“Usam um pequeno escudo de dois pés de diâmetro, côncavo para diante (...). Usam também um punhal ou um gládio. A maior parte dos guerreiros veste couraças de linho e apenas alguns têm cotas de malha (...), usando geralmente elmos de fibras. Os peões (...) estão armados com lanças de ponta de bronze.”</i> — Estrabão, Geografia 3.3.6.<br><br>
+
+                <b>4.4.3 A Luta Contra Roma e a Liderança de Viriato</b><br>
+                A chegada dos Romanos e a sua progressiva conquista da Península forçaram as tribos lusitanas, habituadas a rivalidades internas, a unirem-se contra um inimigo comum. Neste contexto, emergiu a figura de Viriato, um líder carismático e um estratega genial. Recusando-se a aceitar a rendição, Viriato infligiu uma série de derrotas humilhantes a múltiplos generais romanos, como Caio Vetílio, Caio Pláucio e Fábio Máximo. A sua liderança transformou uma resistência dispersa numa campanha militar organizada e eficaz.<br>
+                O sucesso de Viriato foi tal que, em 140 a.C., forçou Roma a negociar um tratado que reconhecia a autonomia lusitana. No entanto, o Senado romano, humilhado, repudiou o acordo e reiniciou a guerra. Incapaz de derrotá-lo em batalha, o general romano Servílio Cipião recorreu à traição. Em 139 a.C., Viriato enviou três dos seus homens de confiança — Audas, Ditalco e Minuros — para negociar a paz. Subornados por Cipião com promessas de riqueza, os emissários regressaram ao acampamento e assassinaram o seu líder enquanto este dormia. A morte de Viriato marcou o fim da resistência organizada e abriu caminho para a inevitável e profunda transformação que se seguiu: a romanização.` 
+            },
+            { 
+                image: './assets/image5.jpg', 
+                title: 'A Chegada das Águias', 
+                text: `Em 218 a.C., um novo poder chegou pelo mar. As legiões de Roma desembarcaram, atraídas pelas ricas minas e pela posição estratégica da Península. A conquista seria longa e difícil, marcada pela feroz resistência dos povos locais, como os Lusitanos liderados por Viriato.<br>
+                A romanização foi um processo transformador e multidimensional que se estendeu por mais de seis séculos. Foi muito além da simples conquista militar, redefinindo permanentemente as estruturas sociais, económicas, políticas e culturais da Península. Roma não se limitou a subjugar os povos peninsulares; integrou-os numa nova ordem territorial e civilizacional, cuja influência perdura até aos dias de hoje.<br><br>
+                
+                <h3 class="font-bold text-amber-800 text-lg">5.1 As Motivações e Fases da Conquista</h3>
+                A conquista romana da Península Ibérica, iniciada em 218 a.C. no contexto da Segunda Guerra Púnica contra Cartago, durou cerca de 200 anos, terminando apenas em 19 a.C. As motivações de Roma eram tanto estratégicas como económicas:<br>
+                <b>Controlo estratégico do Mediterrâneo:</b> A posição geográfica da Península era vital para controlar a ligação ao Atlântico e o acesso ao Norte de África.<br>
+                <b>Riquezas naturais:</b> O território era rico em metais preciosos, como ouro e prata, e outros recursos minerais que eram essenciais para a economia romana.<br>
+                O processo de conquista foi desigual. No sul e no litoral mediterrânico, onde os povos já estavam habituados ao contacto com outras civilizações, a resistência foi fraca. No centro e norte, no entanto, os Romanos enfrentaram uma oposição feroz, simbolizada pela luta dos Lusitanos e, mais tarde, dos Cântabros e Ástures.<br><br>
+
+                <h3 class="font-bold text-amber-800 text-lg">5.2 Os Pilares da Romanização</h3>
+                A profunda influência de Roma foi assegurada por vários agentes de transformação cultural que impuseram um novo modo de vida em todo o território.<br>
+                <b>Urbanismo e Infraestruturas:</b> Os Romanos fundaram inúmeras cidades planeadas à sua imagem, como Bracara Augusta (Braga) e Pax Iulia (Beja). Estas cidades eram centros administrativos e económicos, dotados de edifícios públicos como fóruns, termas, teatros e aquedutos. Para ligar estes centros, construíram uma vasta e duradoura rede de estradas e pontes, que facilitou o comércio, a comunicação e o movimento das legiões.<br>
+                <b>O Latim e o Direito:</b> A imposição do latim como língua oficial foi um dos mais poderosos fatores de unificação. Tornou-se a língua da administração, do comércio e da cultura, dando origem, mais tarde, às línguas românicas da Península, incluindo o português. Igualmente importante foi a implementação do direito romano, um conjunto de leis que regulava a vida pública e privada, estabelecendo uma base legal comum para todo o território.<br>
+                <b>Desenvolvimento Económico:</b> Os Romanos intensificaram e organizaram em larga escala o cultivo da vinha e da oliveira, já presentes na Península por influência grega, e expandiram a produção de trigo. Organizaram a exploração mineira em larga escala e desenvolveram indústrias artesanais, como a olaria, a tecelagem e a salga de peixe, integrando a economia peninsular no vasto mercado do Império.` 
+            },
+            { 
+                image: './assets/image6.jpg', 
+                title: 'O Legado de Roma', 
+                text: `Após a conquista, veio a romanização. Estradas, pontes, cidades, o latim, o direito e, eventualmente, uma nova fé, o Cristianismo. O legado de Roma moldou a Península de forma tão profunda que as suas fundações perduram até hoje no nosso idioma, leis e cultura.<br><br>
+                Inicialmente, os Romanos introduziram o seu panteão de deuses (politeísmo) e o culto ao imperador, que funcionava como um elo de lealdade política em todo o Império. No entanto, uma nova religião monoteísta, o Cristianismo, começou a difundir-se a partir da Palestina. Baseado em princípios como o amor ao próximo, a igualdade e a crença na vida eterna, o Cristianismo foi inicialmente perseguido, pois os seus seguidores recusavam-se a prestar culto ao imperador. Contudo, a sua popularidade cresceu de forma constante. O ponto de viragem ocorreu em 313 d.C., quando o imperador Constantino, através do Édito de Milão, concedeu liberdade de culto aos cristãos. Finalmente, em 380 d.C., o imperador Teodósio, com o Édito de Tessalónica, tornou o Cristianismo a religião oficial do Império Romano, marcando o fim da religião politeísta e consolidando uma nova matriz cultural e espiritual que definiria a Idade Média.<br><br>
+                Com a consolidação do domínio romano e a cristianização do império, a Península Ibérica estava pronta para entrar numa nova fase da sua história, mas as fundações deixadas pelos seus primeiros povos nunca seriam totalmente apagadas.<br><br>
+                Em suma, a Península Ibérica pré-romana era um mosaico vibrante de culturas, caracterizado por um notável grau de desenvolvimento tecnológico e social. Desde as primeiras inovações das comunidades recoletoras, como o domínio do fogo, até à complexa organização urbana dos Iberos e à mestria metalúrgica dos Celtas, os povos que habitaram este território construíram sociedades resilientes e dinâmicas, capazes tanto de evolução interna como de assimilação de influências externas.<br>
+                Apesar da profundidade da romanização, que redefiniu a língua, o direito, a religião e a paisagem da Península, o legado destes primeiros povos persistiu. Elementos da cultura pré-romana sobreviveram, integrando-se subtilmente na nova ordem. Topónimos de origem celta com o sufixo -briga (cidade fortificada), como Conímbriga, ainda marcam a geografia, enquanto tradições rurais, práticas agropastoris e narrativas do folclore ecoam costumes ancestrais. A resistência feroz dos Lusitanos, em particular, deixou uma marca indelével no imaginário coletivo, tornando-se um símbolo da identidade e da luta pela autonomia.<br><br>
+                A história da Península Ibérica é, em última análise, uma narrativa de contínua sobreposição de camadas culturais. Cada nova civilização não apagou completamente a anterior, mas construiu sobre as suas fundações. A herança dos povos pré-romanos constitui o substrato profundo sobre o qual a cultura romana, e mais tarde outras, se assentaram, criando a identidade rica e multifacetada que viria a definir Portugal e Espanha.` 
+            }
         ];
 
         const modules = [
@@ -257,11 +361,11 @@
                             </div>
                             <div class="p-4 sm:p-8">
                                 <div class="grid md:grid-cols-2 gap-6 mb-8">
-                                    <div class="bg-gray-200 rounded-xl overflow-hidden h-64 md:h-96 flex items-center justify-center shadow-lg">
+                                    <div class="bg-gray-200 rounded-xl overflow-hidden h-64 md:h-[60vh] flex items-center justify-center shadow-lg">
                                         ${renderImageWithPlaceholder(page.image, page.title)}
                                     </div>
-                                    <div class="flex items-center">
-                                        <div class="bg-gradient-to-br from-amber-50 to-yellow-50 p-6 rounded-xl border-2 border-amber-200 shadow-md">
+                                    <div class="flex items-start">
+                                        <div class="bg-gradient-to-br from-amber-50 to-yellow-50 p-6 rounded-xl border-2 border-amber-200 shadow-md w-full max-h-[60vh] overflow-y-auto custom-scrollbar">
                                             <p class="text-base sm:text-lg leading-relaxed text-gray-800">${page.text}</p>
                                         </div>
                                     </div>
